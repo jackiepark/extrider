@@ -6,6 +6,7 @@ npm-debug.log
 config.sh
 .idea/*
 *.swp
+dist
 public/javascripts/pages/account-plugins-compiled.js
 public/javascripts/pages/plugin-config-compiled.js
 public/javascripts/pages/plugin-status-compiled.js

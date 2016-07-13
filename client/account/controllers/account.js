@@ -66,42 +66,42 @@ function AccountController($scope, $sce) {
       error: function (xhr, ts, e) {
         $scope.error('Unable to save account', true);
       },
-      success: function(data, ts, xhr) {
+      success: function (data, ts, xhr) {
         delete account.unsaved;
-        next()
+        next();
         $scope.success('Account saved', true);
       }
     });
   };
 
   $scope.changePassword = function () {
-    $.ajax("/api/account/password", {
+    $.ajax('/api/account/password', {
       data: {password: $scope.password},
-      dataType: "json",
-      error: function(xhr, ts, e) {
+      dataType: 'json',
+      error: function (xhr, ts, e) {
         $scope.error('Unable to change password', true);
       },
-      success: function(data, ts, xhr) {
+      success: function (data, ts, xhr) {
         $scope.password = '';
         $scope.confirm_password = '';
         $scope.success('Password changed', true);
       },
-      type: "POST"
+      type: 'POST'
     });
   };
 
   $scope.changeEmail = function () {
-    $.ajax("/api/account/email", {
+    $.ajax('/api/account/email', {
       data: {email:$scope.user.email},
-      dataType: "json",
-      error: function(xhr, ts, e) {
+      dataType: 'json',
+      error: function (xhr, ts, e) {
         var resp = $.parseJSON(xhr.responseText);
         $scope.error('Failed to change email: ' + resp.errors[0].message, true);
       },
-      success: function(data, ts, xhr) {
+      success: function (data, ts, xhr) {
         $scope.success('Email successfully changed', true);
       },
-      type: "POST"
+      type: 'POST'
     });
   };
 }

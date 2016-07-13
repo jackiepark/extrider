@@ -1,6 +1,5 @@
 'use strict';
-
-require('bootstrap');
+require('./styles/strider.less');
 
 var $ = require('jquery');
 var _ = require('lodash');
@@ -15,8 +14,8 @@ $('#layout-header').hide();
 $('#invite-box').height($('#signup-box').height());
 
 // Third party
-require('ui-bootstrap');
-require('ui-codemirror');
+require('angular-ui-bootstrap');
+require('angular-ui-codemirror');
 
 // Modules
 require('./account');

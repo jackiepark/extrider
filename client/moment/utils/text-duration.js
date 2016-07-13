@@ -30,8 +30,8 @@ module.exports = function textDuration(duration, el, whole) {
     cls = time_units[i].cls;
     text = duration + '';
     if (time_units[i].ms) {
-      if (whole) text = parseInt(duration / time_units[i].ms)
-      else text = parseInt(duration / time_units[i].ms * 10) / 10
+      if (whole) text = parseInt(duration / time_units[i].ms);
+      else text = parseInt(duration / time_units[i].ms * 10) / 10;
     }
     text += time_units[i].suffix;
     break;

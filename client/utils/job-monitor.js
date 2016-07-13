@@ -41,7 +41,7 @@ JobMonitor.prototype = {
       this.sock.on(event, handler.bind(this));
     }
     for (var status in this.statuses) {
-      this.sock.on('job.status.' + status, this.update.bind(this, status))
+      this.sock.on('job.status.' + status, this.update.bind(this, status));
     }
   },
   // access: 'yours', 'public', 'admin'
@@ -49,7 +49,7 @@ JobMonitor.prototype = {
     var id = args.shift()
       , job = this.job(id, access)
       , handler = this.statuses[event];
-    if (!job) return this.unknown(id, event, args, access)
+    if (!job) return this.unknown(id, event, args, access);
     if (!handler) return;
     if ('string' === typeof handler) {
       job.status = handler;
@@ -67,7 +67,7 @@ JobMonitor.prototype = {
     this.sock.emit(this.emits.getUnknown, id, this.gotUnknown.bind(this));
   },
   gotUnknown: function (job) {
-    if (!this.waiting[job._id]) return console.warn("Got unknownjob:response but wan't waiting for it...");
+    if (!this.waiting[job._id]) return console.warn('Got unknownjob:response but wan\'t waiting for it...');
     var access = this.waiting[job._id][0][2];
     if (job.status === 'submitted') {
       job.status = 'running';
@@ -109,24 +109,24 @@ JobMonitor.prototype = {
       var path = data.path ? [data.plugin].concat(data.path.split('.')) : [data.plugin]
       , last = path.pop()
       , method = data.method || 'replace'
-      , parent
+      , parent;
       parent = path.reduce(function (obj, attr) {
-        return obj[attr] || (obj[attr] = {})
-      }, this.plugin_data || (this.plugin_data = {}))
+        return obj[attr] || (obj[attr] = {});
+      }, this.plugin_data || (this.plugin_data = {}));
       if (method === 'replace') {
-        parent[last] = data.data
+        parent[last] = data.data;
       } else if (method === 'push') {
         if (!parent[last]) {
-          parent[last] = []
+          parent[last] = [];
         }
-        parent[last].push(data.data)
+        parent[last].push(data.data);
       } else if (method === 'extend') {
         if (!parent[last]) {
-          parent[last] = {}
+          parent[last] = {};
         }
-        _.extend(parent[last], data.data)
+        _.extend(parent[last], data.data);
       } else {
-        console.error('Invalid "plugin data" method received from plugin', data.plugin, data.method, data)
+        console.error('Invalid "plugin data" method received from plugin', data.plugin, data.method, data);
       }
     }
   }

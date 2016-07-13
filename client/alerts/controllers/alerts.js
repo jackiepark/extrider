@@ -28,6 +28,8 @@ module.exports = function ($scope, $sce) {
   };
 
   var waitTime = null;
+  var clearTime = null;
+
   $scope.success = function (text, digest, sticky) {
     if (waitTime) {
       clearTimeout(waitTime);
@@ -57,7 +59,6 @@ module.exports = function ($scope, $sce) {
     }
   };
 
-  var clearTime = null;
   $scope.clearMessage = function () {
     if (clearTime) {
       clearTimeout(clearTime);
