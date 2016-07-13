@@ -66,7 +66,7 @@
     "gravatar": "^1.1.0",
     "httpcheck": "^0.2.0",
     "jade": "^1.11.0",
-    "lodash": "^4.13.1",
+    "lodash": "^3.10.1",
     "mailer": "^0.6.7",
     "md5": "^2.0.0",
     "method-override": "^2.3.0",

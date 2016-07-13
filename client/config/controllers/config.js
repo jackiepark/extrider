@@ -291,7 +291,7 @@ export default function ConfigController($scope, $element, $sce) {
       });
     }
 
-    $scope.plugins.forEach(plugin => {
+    Object.keys($scope.plugins).forEach(plugin => {
       if ($scope.configured[branch.name][plugin]) {
         return;
       }
@@ -309,7 +309,7 @@ export default function ConfigController($scope, $element, $sce) {
       $scope.runnerConfigs[branch.name][branch.runner.id] = branch.runner.config;
     }
 
-    $scope.runners.forEach(runner => {
+    Object.keys($scope.runners).forEach(runner => {
       if (!branch.mirror_master && runner === branch.runner.id) {
         return;
       }

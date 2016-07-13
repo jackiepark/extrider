@@ -49,9 +49,9 @@ class BuildPage extends JobDataMonitor {
     }
     if (!job.phases) {
       job.phases = {};
-      for (i = 0; i < PHASES.length; i++) {
-        job.phases[PHASES[i]] = _.cloneDeep(SKELS.phase);
-      }
+      PHASES.forEach(PHASE => {
+        job.phases[PHASE] = { ...SKELS.phase };
+      });
       job.phases[job.phase].started = new Date();
     } else {
       if (job.phases.test.commands.length) {
