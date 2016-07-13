@@ -1,9 +1,9 @@
 'use strict';
 
-var $ = require('jquery');
+import $ from 'jquery';
 
-module.exports = function ($scope, $attrs) {
-  var provider = $attrs.id.split('-')[1];
+export default function ($scope, $attrs) {
+  const provider = $attrs.id.split('-')[1];
   $scope.config = {};
   $scope.projects = global.manualProjects[provider] || [];
   $scope.remove = function (project) {
@@ -20,7 +20,7 @@ module.exports = function ($scope, $attrs) {
     });
   };
   $scope.create = function () {
-    var name = $scope.display_name.toLowerCase();
+    const name = $scope.display_name.toLowerCase();
     if (!validName(name)) return;
     $.ajax('/' + name + '/', {
       type: 'PUT',

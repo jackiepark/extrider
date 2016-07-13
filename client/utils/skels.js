@@ -1,8 +1,8 @@
 'use strict';
 
-var PHASES = require('./phases');
+import PHASES from './phases';
 
-var SKELS = {
+const SKELS = {
   job: {
     id: null,
     data: null,
@@ -38,4 +38,4 @@ var SKELS = {
   }
 };
 
-module.exports = SKELS;
+export default SKELS;

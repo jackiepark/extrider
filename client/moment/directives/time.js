@@ -1,14 +1,14 @@
 'use strict';
 
-var $ = require('jquery');
-var textDuration = require('../utils/text-duration');
+import $ from 'jquery';
+import textDuration from '../utils/text-duration';
 
-module.exports = function () {
+export default function () {
   return {
     restrict: 'E',
     link: function (scope, element, attrs) {
       if ('undefined' !== typeof attrs.since && !attrs.duration) {
-        var ival = since(attrs.since, element);
+        let ival = since(attrs.since, element);
         $(element).tooltip({title: 'Started ' + new Date(attrs.since).toLocaleString()});
         attrs.$observe('since', function () {
           $(element).tooltip({title: 'Started ' + new Date(attrs.since).toLocaleString()});
@@ -20,12 +20,12 @@ module.exports = function () {
         });
       }
 
-      var date;
+      let date;
       if ('undefined' !== typeof attrs.datetime) {
         date = new Date(attrs.datetime);
         $(element).tooltip({title: date.toLocaleString()});
       }
-      
+
       if ('undefined' !== typeof attrs.duration) {
         attrs.$observe('duration', function () {
           textDuration(attrs.duration, element);
@@ -48,9 +48,9 @@ module.exports = function () {
 };
 
 function since(stamp, el) {
-  var then = new Date(stamp).getTime();
+  const then = new Date(stamp).getTime();
   function update() {
-    var now = new Date().getTime();
+    const now = new Date().getTime();
     textDuration(now - then, el, true);
   }
   update();

@@ -1,17 +1,17 @@
 'use strict';
 
-var $ = require('jquery');
-var user = global.user || {};
-var providers = global.providers || {};
+import $ from 'jquery';
+const user = global.user || {};
+const providers = global.providers || {};
 
-function AccountController($scope, $sce) {
+export default function AccountController($scope, $sce) {
   $scope.user = user;
   $scope.providers = providers;
   $scope.accounts = setupAccounts($scope.user);
 
   $scope.deleteAccount = function (account) {
     if (account.unsaved) {
-      var idx = $scope.accounts[account.provider].indexOf(account);
+      let idx = $scope.accounts[account.provider].indexOf(account);
       $scope.accounts[account.provider].splice(idx, 1);
       idx = $scope.user.accounts.indexOf(account);
       $scope.user.accounts.splice(idx, 1);
@@ -21,7 +21,7 @@ function AccountController($scope, $sce) {
     $.ajax(`/api/account/${account.provider}/${account.id}`, {
       type: 'DELETE',
       success: function () {
-        var idx = $scope.accounts[account.provider].indexOf(account);
+        let idx = $scope.accounts[account.provider].indexOf(account);
         $scope.accounts[account.provider].splice(idx, 1);
         idx = $scope.user.accounts.indexOf(account);
         $scope.user.accounts.splice(idx, 1);
@@ -34,18 +34,17 @@ function AccountController($scope, $sce) {
   };
 
   $scope.addAccount = function (provider) {
-    var id = 0
-      , aid;
+    let id = 0, aid;
     if (!$scope.accounts[provider]) {
       $scope.accounts[provider] = [];
     }
-    for (var i=0; i<$scope.accounts[provider].length; i++) {
-      aid = parseInt($scope.accounts[provider][i].id, 10);
+    $scope.accounts[provider].forEach(account => {
+      aid = parseInt(account.id, 10);
       if (aid >= id) {
         id = aid + 1;
       }
-    }
-    var acct = {
+    });
+    const acct = {
       id: id,
       provider: provider,
       title: provider + ' ' + id,
@@ -95,7 +94,7 @@ function AccountController($scope, $sce) {
       data: {email:$scope.user.email},
       dataType: 'json',
       error: function (xhr, ts, e) {
-        var resp = $.parseJSON(xhr.responseText);
+        const resp = $.parseJSON(xhr.responseText);
         $scope.error('Failed to change email: ' + resp.errors[0].message, true);
       },
       success: function (data, ts, xhr) {
@@ -106,22 +105,19 @@ function AccountController($scope, $sce) {
   };
 }
 
-module.exports = AccountController;
-
 function setupAccounts(user) {
-  var accounts = {};
+  const accounts = {};
 
   if (!user.accounts || !user.accounts.length) {
     return accounts;
   }
 
-  for (var i=0; i<user.accounts.length; i++) {
-    if (!accounts[user.accounts[i].provider]) {
-      accounts[user.accounts[i].provider] = [];
+  user.accounts.forEach(account => {
+    if (!accounts[account.provider]) {
+      accounts[account.provider] = [];
     }
-
-    accounts[user.accounts[i].provider].push(user.accounts[i]);
-  }
+    accounts[account.provider].push(account);
+  });
 
   return accounts;
 }

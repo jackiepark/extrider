@@ -1,6 +1,6 @@
 'use strict';
 
-var $ = require('jquery');
+import $ from 'jquery';
 
 function post(url, data, done) {
   $.ajax({
@@ -13,7 +13,7 @@ function post(url, data, done) {
     },
     error: function (xhr, ts, e) {
       if (xhr && xhr.responseText) {
-        var data = $.parseJSON(xhr.responseText);
+        const data = $.parseJSON(xhr.responseText);
         e = data.errors[0];
       }
       done(e);
@@ -21,4 +21,4 @@ function post(url, data, done) {
   });
 }
 
-module.exports = post;
+export default post;

@@ -2,15 +2,52 @@
 /* global JobMonitor: true, io: true */
 'use strict';
 
-var $ = require('jquery');
-var _ = require('lodash');
-var io = require('socket.io-client');
-var JobMonitor = require('../../utils/job-monitor');
-var statusClasses = require('../../utils/status-classes');
+import $ from 'jquery';
+import io from 'socket.io-client';
+import JobMonitor from '../../utils/job-monitor';
+import statusClasses from '../../utils/status-classes';
 
-module.exports = function ($scope, $element) {
-  var socket = io.connect();
-  var dash = new Dashboard(socket, $scope);
+// Events we care about:
+// - job.new (job, access)
+// - job.done (job, access)
+// - browser.update (event, args, access)
+class Dashboard extends JobMonitor {
+  constructor(socket, $scope) {
+    super(socket, $scope.$digest.bind($scope));
+    this.scope = $scope;
+    this.scope.loadingJobs = false;
+    this.scope.jobs = global.jobs;
+    this.statuses['phase.done'] = data => {
+      this.phase = data.next;
+    };
+  }
+
+  job(id, access) {
+    const jobs = this.scope.jobs[access];
+    return jobs.find(job => job._id === id);
+  }
+
+  addJob(job, access) {
+    let jobs = this.scope.jobs[access],
+      found = jobs.findIndex(each => each.project.name === job.project.name),
+      old;
+    if (found !== -1) {
+      old = jobs.splice(found, 1)[0];
+      job.project.prev = old.project.prev;
+    }
+    if (job.phases) {
+      // get rid of extra data - we don't need it.
+      // note: this won't be passed up anyway for public projects
+      cleanJob(job);
+    }
+    job.phase = 'environment';
+    jobs.unshift(job);
+  }
+}
+
+export default function DashboardController($scope, $element) {
+  const socket = io.connect();
+  const dash = new Dashboard(socket, $scope);
 
   $scope.statusClasses = statusClasses;
   $scope.providers = global.providers;
@@ -18,12 +55,12 @@ module.exports = function ($scope, $element) {
   $('#dashboard').show();
   $scope.startDeploy = function (job) {
     $('.tooltip').hide();
-    var branchToUse = determineTargetBranch(job);
+    const branchToUse = determineTargetBranch(job);
     socket.emit('deploy', job.project.name, branchToUse);
   };
   $scope.startTest = function (job) {
     $('.tooltip').hide();
-    var branchToUse = determineTargetBranch(job);
+    const branchToUse = determineTargetBranch(job);
     socket.emit('test', job.project.name, branchToUse);
   };
   $scope.cancelJob = function (id) {
@@ -48,49 +85,3 @@ function cleanJob(job) {
   delete job.stdmerged;
   delete job.plugin_data;
 }
-
-// Events we care about:
-// - job.new (job, access)
-// - job.done (job, access)
-// - browser.update (event, args, access)
-function Dashboard(socket, $scope) {
-  JobMonitor.call(this, socket, $scope.$digest.bind($scope));
-  this.scope = $scope;
-  this.scope.loadingJobs = false;
-  this.scope.jobs = global.jobs;
-}
-
-_.extend(Dashboard.prototype, JobMonitor.prototype, {
-  job: function (id, access) {
-    var jobs = this.scope.jobs[access];
-    for (var i=0; i<jobs.length; i++) {
-      if (jobs[i]._id === id) return jobs[i];
-    }
-  },
-  addJob: function (job, access) {
-    var jobs = this.scope.jobs[access]
-      , found = -1
-      , old;
-    for (var i=0; i<jobs.length; i++) {
-      if (jobs[i].project.name === job.project.name) {
-        found = i;
-        break;
-      }
-    }
-    if (found !== -1) {
-      old = jobs.splice(found, 1)[0];
-      job.project.prev = old.project.prev;
-    }
-    if (job.phases) {
-      // get rid of extra data - we don't need it.
-      // note: this won't be passed up anyway for public projects
-      cleanJob(job);
-    }
-    job.phase = 'environment';
-    jobs.unshift(job);
-  },
-});
-
-Dashboard.prototype.statuses['phase.done'] = function (data) {
-  this.phase = data.next;
-};

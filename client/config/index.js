@@ -1,19 +1,19 @@
 'use strict';
 
-var angular = require('angular');
-var RunnerController = require('./controllers/runner');
-var ProviderController = require('./controllers/provider');
-var JobController = require('./controllers/job');
-var ConfigController = require('./controllers/config');
-var BranchesController = require('./controllers/branches');
-var CollaboratorsController = require('./controllers/collaborators');
-var DeactivateController = require('./controllers/deactivate');
-var HerokuController = require('./controllers/heroku');
-var GithubController = require('./controllers/github');
-var interpolate = require('../utils/interpolate');
-var ngSortableDirective = require('../utils/ng-sortable-directive');
+import angular from 'angular';
+import RunnerController from './controllers/runner';
+import ProviderController from './controllers/provider';
+import JobController from './controllers/job';
+import ConfigController from './controllers/config';
+import BranchesController from './controllers/branches';
+import CollaboratorsController from './controllers/collaborators';
+import DeactivateController from './controllers/deactivate';
+import HerokuController from './controllers/heroku';
+import GithubController from './controllers/github';
+import interpolate from '../utils/interpolate';
+import ngSortableDirective from '../utils/ng-sortable-directive';
 
-var app = angular.module('config', ['ui.bootstrap', 'ui.codemirror', 'alerts', 'moment'])
+const app = angular.module('config', ['ui.bootstrap', 'ui.codemirror', 'alerts', 'moment'])
   .config(['$interpolateProvider', interpolate])
   .controller('Config', ['$scope', '$element', '$sce', ConfigController])
   .controller('Config.RunnerController', ['$scope', '$element', RunnerController])
@@ -33,4 +33,4 @@ var app = angular.module('config', ['ui.bootstrap', 'ui.codemirror', 'alerts', '
     };
   });
 
-module.exports = app;
+export default app;

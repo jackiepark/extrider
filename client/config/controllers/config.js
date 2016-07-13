@@ -1,19 +1,19 @@
 'use strict';
 
-var $ = require('jquery');
-var _ = require('lodash');
-var md5 = require('md5');
-var bootbox = require('bootbox');
-var post = require('../../utils/post');
-var branches = global.branches || [];
-var project = global.project || {};
-var plugins = global.plugins || {};
-var runners = global.runners || {};
-var userIsCreator = global.userIsCreator || false;
-var userConfigs = global.userConfigs || {};
-var statusBlocks = global.statusBlocks || {};
+import $ from 'jquery';
+import _ from 'lodash';
+import md5 from 'md5';
+import bootbox from 'bootbox';
+import post from '../../utils/post';
+const branches = global.branches || [];
+const project = global.project || {};
+const plugins = global.plugins || {};
+const runners = global.runners || {};
+const userIsCreator = global.userIsCreator || false;
+const userConfigs = global.userConfigs || {};
+const statusBlocks = global.statusBlocks || {};
 
-function ConfigController($scope, $element, $sce) {
+export default function ConfigController($scope, $element, $sce) {
   // this is the parent controller.
   $scope.project = project;
   $scope.plugins = plugins;
@@ -32,21 +32,21 @@ function ConfigController($scope, $element, $sce) {
   $scope.finishedRepeat = function (id) {
     // When a tab is shown, reload any CodeMirror instances within
     $('[data-toggle=tab]').on('shown', function (e) {
-      var tabId = $(e.target).attr('href');
+      const tabId = $(e.target).attr('href');
       $(tabId).find('[ui-codemirror]').trigger('refresh');
     });
   };
 
   $(function ConfigPageRouting() {
-    var router = {
+    const router = {
       init: function () {
-        var self = this;
+        const self = this;
 
         // Set the URL when a tab is selected
         $('a[data-toggle="tab"]').on('show', function (e) {
-          var tabName = $(e.target).attr('href').replace('#', '');
-          var rootPath = global.location.pathname.split('/').slice(0, 4).join('/');
-          var state = global.history.state;
+          const tabName = $(e.target).attr('href').replace('#', '');
+          const rootPath = global.location.pathname.split('/').slice(0, 4).join('/');
+          const state = global.history.state;
 
           selectTab(tabName);
 
@@ -66,7 +66,7 @@ function ConfigController($scope, $element, $sce) {
       },
 
       route: function () {
-        var pathParts = global.location.pathname.split('/');
+        const pathParts = global.location.pathname.split('/');
 
         // Confirm we're on the config page
         if (pathParts.slice(0, 4)[3] === 'config') {
@@ -76,7 +76,7 @@ function ConfigController($scope, $element, $sce) {
 
       routeConfigPage: function (pathParts) {
         // Check the SessionStore to see if we should select a branch
-        var branchName = global.sessionStorage.getItem('branchName');
+        const branchName = global.sessionStorage.getItem('branchName');
 
         if (branchName) {
           switchToBranch(branchName);
@@ -85,8 +85,8 @@ function ConfigController($scope, $element, $sce) {
         }
 
         // Check the URL to see if we should go straight to a tab
-        var lastPart = pathParts[pathParts.length-1];
-        var tabName;
+        const lastPart = pathParts[pathParts.length-1];
+        let tabName;
 
         if (pathParts.length === 5 && lastPart.length) {
           // Yes a tab was supplied
@@ -106,7 +106,7 @@ function ConfigController($scope, $element, $sce) {
   }
 
   function switchToBranch(name) {
-    var branch = _.findWhere($scope.branches, { name: name });
+    const branch = _.findWhere($scope.branches, { name: name });
 
     if (branch) {
       $scope.branch = branch;
@@ -130,13 +130,13 @@ function ConfigController($scope, $element, $sce) {
 
   // When a tab is shown, reload any CodeMirror instances within
   $('[data-toggle=tab]').on('shown', function (e) {
-    var tabId = $(e.target).attr('href');
+    const tabId = $(e.target).attr('href');
     $(tabId).find('[ui-codemirror]').trigger('refresh');
   });
 
   $scope.switchToTab = switchToTab;
 
-  var save_branches = {};
+  const save_branches = {};
 
   $scope.refreshBranches = function () {
     // TODO implement
@@ -151,12 +151,7 @@ function ConfigController($scope, $element, $sce) {
   $scope.savePluginOrder = savePluginOrder;
 
   $scope.switchToMaster = function () {
-    for (var i = 0; i < $scope.project.branches.length; i++) {
-      if ($scope.project.branches[i].name === 'master') {
-        $scope.branch = $scope.project.branches[i];
-        return;
-      }
-    }
+    $scope.branch = $scope.project.branches.find(branch => branch.name === 'master');
   };
 
   $scope.clearCache = function () {
@@ -183,16 +178,8 @@ function ConfigController($scope, $element, $sce) {
       $scope.branch.mirror_master = false;
       $scope.branch.isCustomizable = true;
 
-      var name = $scope.branch.name;
-      var master;
-
-      for (var i = 0; i < $scope.project.branches.length; i++) {
-        if ($scope.project.branches[i].name === 'master') {
-          master = $scope.project.branches[i];
-          break;
-        }
-      }
-
+      const name = $scope.branch.name;
+      const master = $scope.project.branches.find(branch => branch.name === 'master');
       $scope.branch = $.extend(true, $scope.branch, master);
       $scope.branch.name = name;
       initBranch($scope.branch);
@@ -209,7 +196,7 @@ function ConfigController($scope, $element, $sce) {
   };
 
   $scope.setRunner = function (name) {
-    var config = $scope.runnerConfigs[name];
+    const config = $scope.runnerConfigs[name];
 
     $scope.branch.runner.id = name;
     $scope.branch.runner.config = config;
@@ -217,30 +204,24 @@ function ConfigController($scope, $element, $sce) {
   };
 
   function updateConfigured() {
-    var plugins = $scope.branch.plugins;
+    const plugins = $scope.branch.plugins;
 
     $scope.configured[$scope.branch.name] = {};
-
-    for (var i = 0; i < plugins.length; i++) {
-      $scope.configured[$scope.branch.name][plugins[i].id] = true;
-    }
-
+    plugins.forEach(plugin => {
+      $scope.configured[$scope.branch.name][plugin.id] = true;
+    });
     savePluginOrder();
   }
 
   function savePluginOrder() {
-    var plugins = $scope.branch.plugins;
-    var branch = $scope.branch;
-    var project = $scope.project;
-    var data = [];
-
-    for (var i = 0; i < plugins.length; i++) {
-      data.push({
-        id: plugins[i].id,
-        enabled: plugins[i].enabled,
-        showStatus: plugins[i].showStatus
-      });
-    }
+    const plugins = $scope.branch.plugins;
+    const branch = $scope.branch;
+    const project = $scope.project;
+    const data = plugins.map(plugin => ({
+      id: plugin.id,
+      enabled: plugin.enabled,
+      showStatus: plugin.showStatus
+    }));
 
     saveProjectConfig({ plugin_order: data }, branch, project, function (err, result) {
       if (err) {
@@ -263,7 +244,7 @@ function ConfigController($scope, $element, $sce) {
     // enable it
     _.find($scope.branch.plugins, { id: target.id }).enabled = true;
     // remove from disabled list
-    var disabled = $scope.disabled_plugins[$scope.branch.name];
+    const disabled = $scope.disabled_plugins[$scope.branch.name];
     disabled.splice(_.indexOf(_.pluck(disabled, 'id'), target.id), 1);
     updateConfigured();
   };
@@ -273,16 +254,16 @@ function ConfigController($scope, $element, $sce) {
     // add it to the disabled list
     $scope.disabled_plugins[$scope.branch.name].splice(index, 0, target);
     // remove it from enabled list
-    var enabled = $scope.branch.plugins;
+    const enabled = $scope.branch.plugins;
     enabled.splice(_.indexOf(_.pluck(enabled, 'id'), target.id), 1);
     updateConfigured();
   };
 
   $scope.setImgStyle = function (pluginInfo) {
-    var pluginId = pluginInfo.id;
-    var plugins = $scope.plugins;
-    var plugin = plugins[pluginId];
-    var icon, iconBg;
+    const pluginId = pluginInfo.id;
+    const plugins = $scope.plugins;
+    const plugin = plugins[pluginId];
+    let icon, iconBg;
 
     if (plugin) {
       icon = plugin.icon;
@@ -298,25 +279,21 @@ function ConfigController($scope, $element, $sce) {
   };
 
   function initBranch(branch) {
-    var plugins;
-
     $scope.configured[branch.name] = {};
     $scope.configs[branch.name] = {};
     $scope.runnerConfigs[branch.name] = {};
     $scope.disabled_plugins[branch.name] = [];
 
     if (!branch.mirror_master) {
-      plugins = branch.plugins;
-
-      for (var i = 0; i < plugins.length; i++) {
-        $scope.configured[branch.name][plugins[i].id] = true;
-        $scope.configs[branch.name][plugins[i].id] = plugins[i];
-      }
+      branch.plugins.forEach(plugin => {
+        $scope.configured[branch.name][plugin.id] = true;
+        $scope.configs[branch.name][plugin.id] = plugin;
+      });
     }
 
-    for (var plugin in $scope.plugins) {
+    $scope.plugins.forEach(plugin => {
       if ($scope.configured[branch.name][plugin]) {
-        continue;
+        return;
       }
 
       $scope.configs[branch.name][plugin] = {
@@ -326,23 +303,22 @@ function ConfigController($scope, $element, $sce) {
       };
 
       $scope.disabled_plugins[branch.name].push($scope.configs[branch.name][plugin]);
-    }
+    });
 
     if (!branch.mirror_master) {
       $scope.runnerConfigs[branch.name][branch.runner.id] = branch.runner.config;
     }
 
-    for (var runner in $scope.runners) {
+    $scope.runners.forEach(runner => {
       if (!branch.mirror_master && runner === branch.runner.id) {
-        continue;
+        return;
       }
-
       $scope.runnerConfigs[branch.name][runner] = {};
-    }
+    });
   }
 
   function initPlugins() {
-    var branches = $scope.project.branches;
+    const branches = $scope.project.branches;
 
     branches.forEach(branch => {
       initBranch(branch);
@@ -350,9 +326,9 @@ function ConfigController($scope, $element, $sce) {
   }
 
   $scope.saveGeneralBranch = function (plugins) {
-    var branch = $scope.branch;
-    var project = $scope.project;
-    var data = {
+    const branch = $scope.branch;
+    const project = $scope.project;
+    const data = {
       active: branch.active,
       privkey: branch.privkey,
       pubkey: branch.pubkey,
@@ -400,7 +376,7 @@ function ConfigController($scope, $element, $sce) {
       return '';
     }
 
-    var hash = md5(email.toLowerCase());
+    const hash = md5(email.toLowerCase());
     return 'https://secure.gravatar.com/avatar/' + hash + '?d=identicon';
   };
 
@@ -416,7 +392,7 @@ function ConfigController($scope, $element, $sce) {
       },
       error: function (xhr, ts, e) {
         if (xhr && xhr.responseText) {
-          var data = $.parseJSON(xhr.responseText);
+          const data = $.parseJSON(xhr.responseText);
           $scope.error('Error setting runner id to ' + id);
         }
       }
@@ -431,7 +407,7 @@ function ConfigController($scope, $element, $sce) {
       branch = $scope.branch;
     }
 
-    var name = $scope.branch.runner.id;
+    const name = $scope.branch.runner.id;
 
     if (arguments.length < 2) {
       return $scope.runnerConfigs[name];
@@ -450,7 +426,7 @@ function ConfigController($scope, $element, $sce) {
       },
       error: function (xhr, ts, e) {
         if (xhr && xhr.responseText) {
-          var data = $.parseJSON(xhr.responseText);
+          const data = $.parseJSON(xhr.responseText);
           $scope.error('Error saving runner config: ' + data.errors[0]);
         } else {
           $scope.error('Error saving runner config: ' + e);
@@ -505,7 +481,7 @@ function ConfigController($scope, $element, $sce) {
       return;
     }
 
-    var plugin = $scope.configs[branch.name][name];
+    const plugin = $scope.configs[branch.name][name];
 
     if (arguments.length < 3) {
       return plugin.config;
@@ -529,7 +505,7 @@ function ConfigController($scope, $element, $sce) {
       },
       error: function (xhr, ts, e) {
         if (xhr && xhr.responseText) {
-          var data = $.parseJSON(xhr.responseText);
+          const data = $.parseJSON(xhr.responseText);
           $scope.error('Error saving ' + name + ' config on branch ' + branch.name + ': ' + data.errors[0]);
         } else {
           $scope.error('Error saving ' + name + ' config on branch ' + branch.name + ': ' + e);
@@ -566,7 +542,7 @@ function ConfigController($scope, $element, $sce) {
       },
       error: function (xhr, ts, e) {
         if (xhr && xhr.responseText) {
-          var data = $.parseJSON(xhr.responseText);
+          const data = $.parseJSON(xhr.responseText);
           $scope.error('Error starting test job for ' + name + ' on branch ' + $scope.branch.name + ': ' + data.errors[0]);
         }
       }
@@ -584,7 +560,7 @@ function ConfigController($scope, $element, $sce) {
       },
       error: function (xhr, ts, e) {
         if (xhr && xhr.responseText) {
-          var data = $.parseJSON(xhr.responseText);
+          const data = $.parseJSON(xhr.responseText);
           $scope.error('Error starting deploy job for ' + name + ' on branch ' + $scope.branch.name + ': ' + data.errors[0]);
         }
       }
@@ -635,5 +611,3 @@ function saveProjectConfig(data, branch, project, cb) {
     }
   });
 }
-
-module.exports = ConfigController;

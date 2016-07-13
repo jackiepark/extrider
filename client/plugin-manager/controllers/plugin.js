@@ -1,8 +1,8 @@
 'use strict';
 
-var plugins = global.plugins || {};
+const plugins = global.plugins || {};
 
-module.exports = function ($http, $timeout) {
+export default function ($http, $timeout) {
   this.idle = true;
   this.status = 'idle';
 
@@ -10,7 +10,7 @@ module.exports = function ($http, $timeout) {
     this.id = id;
     this.plugin = plugins[id];
     this.plugin.controller = this;
-    for (var key in this.plugin) {
+    for (const key in this.plugin) {
       this[key] = this.plugin[key];
     }
     this.pluginLoaded = true;
@@ -44,7 +44,7 @@ module.exports = function ($http, $timeout) {
     }.bind(this));
   };
 
-  var waitForRestart = function (cb) {
+  const waitForRestart = function (cb) {
     $http.head('/').success(function () {
       cb();
     }).error(function () {

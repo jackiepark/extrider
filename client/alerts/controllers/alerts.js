@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function ($scope, $sce) {
+export default function AlertsController($scope, $sce) {
   $scope.message = null;
 
   $scope.error = function (text, digest) {
@@ -27,8 +27,8 @@ module.exports = function ($scope, $sce) {
     }
   };
 
-  var waitTime = null;
-  var clearTime = null;
+  let waitTime = null;
+  let clearTime = null;
 
   $scope.success = function (text, digest, sticky) {
     if (waitTime) {

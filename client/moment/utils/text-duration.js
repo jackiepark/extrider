@@ -1,8 +1,8 @@
 'use strict';
 
-var $ = require('jquery');
+import $ from 'jquery';
 
-var time_units = [
+const time_units = [
   {
     ms: 60 * 60 * 1000,
     cls: 'hours',
@@ -22,19 +22,19 @@ var time_units = [
   }
 ];
 
-module.exports = function textDuration(duration, el, whole) {
+export default function textDuration(duration, el, whole) {
   if (!duration) return $(el).text('');
-  var cls = '', text;
-  for (var i=0; i<time_units.length; i++) {
-    if (duration < time_units[i].ms) continue;
-    cls = time_units[i].cls;
+  let cls = '', text = '';
+  time_units.every(unit => {
+    if (duration < unit.ms) return true;
+    cls = unit.cls;
     text = duration + '';
-    if (time_units[i].ms) {
-      if (whole) text = parseInt(duration / time_units[i].ms);
-      else text = parseInt(duration / time_units[i].ms * 10) / 10;
+    if (unit.ms) {
+      if (whole) text = parseInt(duration / unit.ms);
+      else text = parseInt(duration / unit.ms * 10) / 10;
     }
-    text += time_units[i].suffix;
-    break;
-  }
+    text += unit.suffix;
+    return false;
+  });
   $(el).addClass(cls).text(text);
 };

@@ -7,6 +7,9 @@
   "ecmaFeatures": {
     "modules": true
   },
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "globals": {
     "google": false
   },
@@ -20,5 +23,6 @@
    "space-before-function-paren":[2, {"anonymous": "always", "named": "never"}],
    // "func-style": [2, "declaration"],
    "semi": 2
-  }
+  },
+  "parser": "babel-eslint"
 }

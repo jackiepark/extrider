@@ -1,8 +1,8 @@
 'use strict';
 
-var $ = require('jquery');
+import $ from 'jquery';
 
-function HerokuController($scope) {
+export default function HerokuController($scope) {
   $scope.heroku = $scope.panelData.heroku;
   $scope.deploy_on_green = ($scope.repo.prod_deploy_target ?
                             $scope.repo.prod_deploy_target.deploy_on_green : true);
@@ -41,7 +41,7 @@ function HerokuController($scope) {
   };
 
   $scope.herokuSelect = function () {
-    var app_name = $scope.which_app;
+    let app_name = $scope.which_app;
     if (app_name === '@@new@@') {
       app_name = $scope.new_app_name;
     }
@@ -54,7 +54,7 @@ function HerokuController($scope) {
       },
       dataType: 'json',
       error: function (xhr, ts, e) {
-        var data = $.parseJSON(xhr.responseText);
+        const data = $.parseJSON(xhr.responseText);
         $scope.error('Error: ' + data.errors[0]);
         $scope.loading = false;
         $scope.$root.$digest();
@@ -113,5 +113,3 @@ function HerokuController($scope) {
     });
   };
 }
-
-module.exports = HerokuController;

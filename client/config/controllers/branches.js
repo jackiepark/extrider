@@ -1,16 +1,16 @@
 'use strict';
 
-var $ = require('jquery');
-var branches = global.branches || [];
-var allBranches = global.allBranches || [];
+import $ from 'jquery';
+const branches = global.branches || [];
+const allBranches = global.allBranches || [];
 
-function BranchesController($scope) {
+export default function BranchesController($scope) {
   $scope.branchName = '';
   $scope.branches = branches;
   $scope.allBranches = allBranches;
 
   $scope.remove = function (item) {
-    var actuallyDelete = confirm('Are you sure you want to remove ' + item.name + '?');
+    const actuallyDelete = confirm('Are you sure you want to remove ' + item.name + '?');
     if (actuallyDelete) {
       item.loading = true;
       $scope.clearMessage();
@@ -25,7 +25,7 @@ function BranchesController($scope) {
         error: function (xhr, ts, e) {
           item.loading = false;
           if (xhr && xhr.responseText) {
-            var data = $.parseJSON(xhr.responseText);
+            const data = $.parseJSON(xhr.responseText);
             $scope.error('Error deleting branch: ' + data.errors[0], true);
           } else {
             $scope.error('Error deleting branch: ' + e, true);
@@ -36,7 +36,7 @@ function BranchesController($scope) {
   };
 
   $scope.add = function () {
-    var data = { name: $scope.branchName };
+    const data = { name: $scope.branchName };
 
     $.ajax({
       url: '/' + $scope.project.name + '/branches/',
@@ -52,7 +52,7 @@ function BranchesController($scope) {
       },
       error: function (xhr, ts, e) {
         if (xhr && xhr.responseText) {
-          var data = $.parseJSON(xhr.responseText);
+          const data = $.parseJSON(xhr.responseText);
           $scope.error('Error adding branch: ' + data.errors[0], true);
         } else {
           $scope.error('Error adding branch: ' + e, true);
@@ -74,7 +74,7 @@ function BranchesController($scope) {
       },
       error: function (xhr, ts, e) {
         if (xhr && xhr.responseText) {
-          var data = $.parseJSON(xhr.responseText);
+          const data = $.parseJSON(xhr.responseText);
           $scope.error('Error changing order of branch: ' + data.errors[0], true);
         } else {
           $scope.error('Error changing order of branch: ' + e, true);
@@ -84,13 +84,13 @@ function BranchesController($scope) {
   };
 
   $scope.clone = function (item) {
-    var cloneName = prompt('Enter name of the clone', item.name);
+    const cloneName = prompt('Enter name of the clone', item.name);
 
     if (!cloneName) {
       return;
     }
 
-    var data = { name: item.name, cloneName: cloneName };
+    const data = { name: item.name, cloneName: cloneName };
 
     $.ajax({
       url: '/' + $scope.project.name + '/branches/',
@@ -106,7 +106,7 @@ function BranchesController($scope) {
       },
       error: function (xhr, ts, e) {
         if (xhr && xhr.responseText) {
-          var data = $.parseJSON(xhr.responseText);
+          const data = $.parseJSON(xhr.responseText);
           $scope.error('Error cloning branch: ' + data.errors[0], true);
         } else {
           $scope.error('Error cloning branch: ' + e, true);
@@ -119,5 +119,3 @@ function BranchesController($scope) {
 function remove(ar, item) {
   ar.splice(ar.indexOf(item), 1);
 }
-
-module.exports = BranchesController;

@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = {
+export default {
   passed: 'fa-check-circle success-text',
   failed: 'fa-exclamation-circle failure-text',
   running: 'fa-cog fa-spin',

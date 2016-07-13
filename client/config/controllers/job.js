@@ -1,7 +1,7 @@
 'use strict';
 
-function JobController($scope, $element) {
-  var name = $element.attr('id').split('-').slice(1).join('-');
+export default function JobController($scope, $element) {
+  const name = $element.attr('id').split('-').slice(1).join('-');
 
   $scope.saving = false;
 
@@ -20,5 +20,3 @@ function JobController($scope, $element) {
     });
   };
 }
-
-module.exports = JobController;

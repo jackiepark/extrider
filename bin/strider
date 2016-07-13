@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+require('babel-register');
+require('babel-polyfill');
 var cli = require('strider-cli')({
   version: require('../package.json').version,
   /*
@@ -40,7 +42,7 @@ var cli = require('strider-cli')({
     console.log('Connecting to MongoDB URL: %s\n', mongodbUrl);
     mongoose.connect(mongodbUrl, cb);
   },
-  /* 
+  /*
    * Path to file to touch to restart strider
    */
   restartFile: function() {

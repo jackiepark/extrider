@@ -1,11 +1,11 @@
 'use strict';
 
-var angular = require('angular');
-var interpolate = require('../utils/interpolate');
-var DashboardController = require('./controllers/dashboard');
+import angular from 'angular';
+import interpolate from '../utils/interpolate';
+import DashboardController from './controllers/dashboard';
 
-var app = angular.module('dashboard', ['moment'])
+const app = angular.module('dashboard', ['moment'])
   .config(['$interpolateProvider', interpolate])
   .controller('Dashboard', ['$scope', '$element', DashboardController]);
 
-module.exports = app;
+export default app;

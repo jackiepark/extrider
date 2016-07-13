@@ -1,8 +1,8 @@
 'use strict';
 
-var $ = require('jquery');
+import $ from 'jquery';
 
-module.exports = function ($scope) {
+export default function ($scope) {
   setTimeout(function () {
     if (global.location.hash === '#manual') $('a[href="#manual-setup"]').tab('show');
   }, 200);
@@ -69,7 +69,7 @@ module.exports = function ($scope) {
         $scope.$digest();
       },
       error: function (xhr, ts, e) {
-        var error;
+        let error;
 
         if (xhr && xhr.responseText) {
           error = 'Error creating project for repo ' + repo.name + ': ' + xhr.responseText;

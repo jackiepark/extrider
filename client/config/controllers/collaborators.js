@@ -1,13 +1,13 @@
 'use strict';
 
-var $ = require('jquery');
+import $ from 'jquery';
 
-function CollaboratorsController($scope) {
+export default function CollaboratorsController($scope) {
   $scope.new_email = '';
   $scope.new_access = 0;
   $scope.collaborators = global.collaborators || [];
   $scope.remove = function (item) {
-    var actuallyDelete = confirm('Are you sure you want to remove ' + item.email + '?');
+    const actuallyDelete = confirm('Are you sure you want to remove ' + item.email + '?');
     if (actuallyDelete) {
       item.loading = true;
       $scope.clearMessage();
@@ -22,7 +22,7 @@ function CollaboratorsController($scope) {
         error: function (xhr, ts, e) {
           item.loading = false;
           if (xhr && xhr.responseText) {
-            var data = $.parseJSON(xhr.responseText);
+            const data = $.parseJSON(xhr.responseText);
             $scope.error('Error deleting collaborator: ' + data.errors[0], true);
           } else {
             $scope.error('Error deleting collaborator: ' + e, true);
@@ -32,7 +32,7 @@ function CollaboratorsController($scope) {
     }
   };
   $scope.add = function () {
-    var data = {
+    const data = {
       email: $scope.new_email,
       access: $scope.new_access || 0,
       gravatar: $scope.gravatar($scope.new_email),
@@ -54,7 +54,7 @@ function CollaboratorsController($scope) {
       },
       error: function (xhr, ts, e) {
         if (xhr && xhr.responseText) {
-          var data = $.parseJSON(xhr.responseText);
+          const data = $.parseJSON(xhr.responseText);
           $scope.error('Error adding collaborator: ' + data.errors[0], true);
         } else {
           $scope.error('Error adding collaborator: ' + e, true);
@@ -67,5 +67,3 @@ function CollaboratorsController($scope) {
 function remove(ar, item) {
   ar.splice(ar.indexOf(item), 1);
 }
-
-module.exports = CollaboratorsController;

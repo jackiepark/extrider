@@ -1,11 +1,11 @@
 'use strict';
 require('./styles/strider.less');
 
-var $ = require('jquery');
-var _ = require('lodash');
-var angular = require('angular');
-var ngRoute = require('angular-route');
-var $navbar = $('.navbar');
+import $ from 'jquery';
+import _ from 'lodash';
+import angular from 'angular';
+import ngRoute from 'angular-route';
+const $navbar = $('.navbar');
 
 $navbar.find('li').removeClass('active');
 $navbar.find('a[href="' + global.location.pathname + '"]')
@@ -30,7 +30,7 @@ require('./alerts');
 require('./ansi');
 require('./moment');
 
-var app = angular.module('app', [
+const app = angular.module('app', [
   'config',
   'account',
   'plugin-manager',

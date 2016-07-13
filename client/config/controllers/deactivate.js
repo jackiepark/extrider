@@ -1,15 +1,15 @@
 'use strict';
 
-var $ = require('jquery');
-var bootbox = require('bootbox');
+import $ from 'jquery';
+import bootbox from 'bootbox';
 
-function DeactivateController($scope) {
-  var message = 'This will remove all configuration and history for this project. You can always re-add it on the /projects page';
+export default function DeactivateController($scope) {
+  const message = 'This will remove all configuration and history for this project. You can always re-add it on the /projects page';
   $scope.active = $scope.panelData.deactivate;
   $scope.loading = false;
   $scope.toggleActive = function () {
     $scope.active = !$scope.active;
-    var data = {url: $scope.repo.url, active: $scope.active};
+    const data = {url: $scope.repo.url, active: $scope.active};
     $.ajax({
       url: '/api/repo',
       type: 'POST',
@@ -21,7 +21,7 @@ function DeactivateController($scope) {
       },
       error: function (xhr, ts, e) {
         if (xhr && xhr.responseText) {
-          var data = $.parseJSON(xhr.responseText);
+          const data = $.parseJSON(xhr.responseText);
           $scope.error('Error settings active state: ' + data.errors[0]);
         } else {
           $scope.error('Error settings active state: ' + e);
@@ -48,7 +48,7 @@ function DeactivateController($scope) {
         },
         error: function (xhr, ts, e) {
           if (xhr && xhr.responseText) {
-            var data = $.parseJSON(xhr.responseText);
+            const data = $.parseJSON(xhr.responseText);
             $scope.error('Error deleting project: ' + data.errors[0]);
           } else {
             $scope.error('Error deleting project: ' + e);
@@ -59,5 +59,3 @@ function DeactivateController($scope) {
     });
   };
 }
-
-module.exports = DeactivateController;

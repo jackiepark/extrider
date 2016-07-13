@@ -1,13 +1,13 @@
 'use strict';
 
-var plugins = global.plugins || [];
+const plugins = global.plugins || [];
 
-module.exports = function ($scope) {
+export default function ($scope) {
   this.busy = false;
 
   this.hasUpgrades = (function () {
-    for (var name in plugins) {
-      var plugin = plugins[name];
+    for (const name in plugins) {
+      const plugin = plugins[name];
       if (plugin.outdated) return true;
     }
     return false;
@@ -15,16 +15,16 @@ module.exports = function ($scope) {
 
   this.upgradeAll = function () {
     this.busy = true;
-    var ticks = 0;
-    var list = [];
-    for (var name in plugins) {
-      var plugin = plugins[name];
+    let ticks = 0;
+    const list = [];
+    for (const name in plugins) {
+      const plugin = plugins[name];
       if (plugin.outdated) list.push(plugin);
     }
 
-    var upgrader = function (i){
+    const upgrader = function (i){
       if ( i < list.length ) {
-        var pluginCtrl = list[i].controller;
+        const pluginCtrl = list[i].controller;
         pluginCtrl.upgrade(function (err) {
           if (err) {
             return global.alert('Batch upgrade aborted due to error:\n'+err.message);
@@ -48,11 +48,11 @@ module.exports = function ($scope) {
       if (err) {
         global.alert(err.message);
       }
-      
+
       // cleanup plugin in main list
       plugins[plugin.id].installed = false;
       delete plugins[plugin.id].outdated;
-      
+
       this.busy = false;
     }.bind(this));
   };

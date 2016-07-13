@@ -1,7 +1,7 @@
 'use strict';
 
-var angular = require('angular');
-var ansi = require('./filters/ansi');
+import angular from 'angular';
+import ansi from './filters/ansi';
 
-var app = angular.module('ansi', [])
+const app = angular.module('ansi', [])
   .filter('ansi', ansi);

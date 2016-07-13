@@ -1,24 +1,95 @@
 'use strict';
 
-var _ = require('lodash');
-var bootbox = require('bootbox');
-var $ = require('jquery');
-var io = require('socket.io-client');
-var JobDataMonitor = require('../../utils/job-data-monitor');
-var PHASES = require('../../utils/phases');
-var SKELS = require('../../utils/skels');
-var statusClasses = require('../../utils/status-classes');
-var outputConsole;
-var runtime = null;
-var job = global.job;
+import _ from 'lodash';
+import bootbox from 'bootbox';
+import $ from 'jquery';
+import io from 'socket.io-client';
+import JobDataMonitor from '../../utils/job-data-monitor';
+import PHASES from '../../utils/phases';
+import SKELS from '../../utils/skels';
+import statusClasses from '../../utils/status-classes';
 
-module.exports = function ($scope, $route, $location, $filter) {
-  var params = $route.current ? $route.current.params : {};
-  var project = global.project;
-  var jobid = params.id || (global.job && global.job._id);
-  var socket = io.connect();
-  var lastRoute = $route.current;
-  var jobman = new BuildPage(socket, project.name, $scope.$digest.bind($scope), $scope, global.jobs, global.job);
+let outputConsole;
+let runtime = null;
+
+const job = global.job;
+const project = global.project;
+
+class BuildPage extends JobDataMonitor {
+  constructor(socket, project, change, scope, jobs, job) {
+    super(socket, change);
+    this.scope = scope;
+    this.project = project;
+    this.jobs = {};
+    this.jobs[job._id] = job;
+  }
+
+  emits = {
+    getUnknown: 'build:job'
+  };
+
+  job(id, access) {
+    return this.jobs[id];
+  }
+
+  addJob(job, access) {
+    if ((job.project.name || job.project) !== this.project) return;
+    this.jobs[job._id] = job;
+    const found = this.scope.jobs.findIndex(each => each === job._id);
+    if (found !== -1) {
+      this.scope.jobs.splice(found, 1);
+    }
+    if (!job.phase) job.phase = 'environment';
+    if (!job.std) {
+      job.std = {
+        out: '',
+        err: '',
+        merged: ''
+      };
+    }
+    if (!job.phases) {
+      job.phases = {};
+      for (i = 0; i < PHASES.length; i++) {
+        job.phases[PHASES[i]] = _.cloneDeep(SKELS.phase);
+      }
+      job.phases[job.phase].started = new Date();
+    } else {
+      if (job.phases.test.commands.length) {
+        if (job.phases.environment) {
+          job.phases.environment.collapsed = true;
+        }
+        if (job.phases.prepare) {
+          job.phases.prepare.collapsed = true;
+        }
+        if (job.phases.cleanup) {
+          job.phases.cleanup.collapsed = true;
+        }
+      }
+    }
+
+    this.scope.jobs.unshift(job);
+    this.scope.job = job;
+  }
+
+  get(id, done) {
+    if (this.jobs[id]) {
+      done(null, this.jobs[id], true);
+      return true;
+    }
+    const self = this;
+    this.sock.emit('build:job', id, function (job) {
+      self.jobs[id] = job;
+      done(null, job);
+    });
+  }
+}
+
+export default function JobController($scope, $route, $location, $filter) {
+  let params = $route.current ? $route.current.params : {};
+  let jobid = params.id || (global.job && global.job._id);
+  const socket = io.connect();
+  const lastRoute = $route.current;
+  const jobman = new BuildPage(socket, project.name, $scope.$digest.bind($scope), $scope, global.jobs, global.job);
 
   outputConsole = global.document.querySelector('.console-output');
 
@@ -73,7 +144,7 @@ module.exports = function ($scope, $route, $location, $filter) {
     $route.current = lastRoute;
     if (jobid !== params.id) {
       jobid = params.id;
-      var cached = jobman.get(jobid, function (err, job, cached) {
+      const cached = jobman.get(jobid, function (err, job, cached) {
         if (job.phases.environment) {
           job.phases.environment.collapsed = true;
         }
@@ -92,12 +163,7 @@ module.exports = function ($scope, $route, $location, $filter) {
         if (!cached) $scope.$digest();
       });
       if (!cached) {
-        for (var i=0; i<$scope.jobs.length; i++) {
-          if ($scope.jobs[i]._id === jobid) {
-            $scope.job = $scope.jobs[i];
-            break;
-          }
-        }
+        $scope.job = $scope.jobs.find(job => job._id === jobid);
       }
     }
   });
@@ -137,14 +203,14 @@ module.exports = function ($scope, $route, $location, $filter) {
 
   $scope.$watch('job.std.merged_latest', function (value) {
     /* Tracking isn't quite working right
-    if ($scope.job.status === 'running') {
-      height = outputConsole.getBoundingClientRect().height;
-      tracking = height + outputConsole.scrollTop > outputConsole.scrollHeight - 50;
-      // console.log(tracking, height, outputConsole.scrollTop, outputConsole.scrollHeight);
-      if (!tracking) return;
-    }
-    */
-    var ansiFilter = $filter('ansi');
+     if ($scope.job.status === 'running') {
+     height = outputConsole.getBoundingClientRect().height;
+     tracking = height + outputConsole.scrollTop > outputConsole.scrollHeight - 50;
+     // console.log(tracking, height, outputConsole.scrollTop, outputConsole.scrollHeight);
+     if (!tracking) return;
+     }
+     */
+    const ansiFilter = $filter('ansi');
     $('.job-output').last().append(ansiFilter(value));
     outputConsole.scrollTop = outputConsole.scrollHeight;
     setTimeout(function () {
@@ -176,90 +242,19 @@ module.exports = function ($scope, $route, $location, $filter) {
   };
 };
 
-function BuildPage(socket, project, change, scope, jobs, job) {
-  JobDataMonitor.call(this, socket, change);
-  this.scope = scope;
-  this.project = project;
-  this.jobs = {};
-  this.jobs[job._id] = job;
-}
-
-_.extend(BuildPage.prototype, JobDataMonitor.prototype, {
-  emits: {
-    getUnknown: 'build:job'
-  },
-  job: function (id, access) {
-    return this.jobs[id];
-  },
-  addJob: function (job, access) {
-    if ((job.project.name || job.project) !== this.project) return;
-    this.jobs[job._id] = job;
-    var found = -1
-      , i;
-    for (i=0; i<this.scope.jobs.length; i++) {
-      if (this.scope.jobs[i]._id === job._id) {
-        found = i;
-        break;
-      }
-    }
-    if (found !== -1) {
-      this.scope.jobs.splice(found, 1);
-    }
-    if (!job.phase) job.phase = 'environment';
-    if (!job.std) {
-      job.std = {
-        out: '',
-        err: '',
-        merged: ''
-      };
-    }
-    if (!job.phases) {
-      job.phases = {};
-      for (i=0; i<PHASES.length; i++) {
-        job.phases[PHASES[i]] = _.cloneDeep(SKELS.phase);
-      }
-      job.phases[job.phase].started = new Date();
-    } else {
-      if (job.phases.test.commands.length) {
-        if (job.phases.environment) {
-          job.phases.environment.collapsed = true;
-        }
-        if (job.phases.prepare) {
-          job.phases.prepare.collapsed = true;
-        }
-        if (job.phases.cleanup) {
-          job.phases.cleanup.collapsed = true;
-        }
-      }
-    }
-
-    this.scope.jobs.unshift(job);
-    this.scope.job = job;
-  },
-  get: function (id, done) {
-    if (this.jobs[id]) {
-      done(null, this.jobs[id], true);
-      return true;
-    }
-    var self = this;
-    this.sock.emit('build:job', id, function (job) {
-      self.jobs[id] = job;
-      done(null, job);
-    });
-  }
-});
-
 /** manage the favicons **/
 function setFavicon(status) {
   $('link[rel*="icon"]').attr('href', '/images/icons/favicon-' + status + '.png');
 }
 
 function animateFav() {
-  var alt = false;
+  let alt = false;
+
   function switchit() {
     setFavicon('running' + (alt ? '-alt' : ''));
     alt = !alt;
   }
+
   return setInterval(switchit, 500);
 }
 
@@ -279,16 +274,10 @@ function updateFavicon(value) {
 
 function buildSwitcher($scope) {
   function switchBuilds(evt) {
-    var dy = {40: 1, 38: -1}[evt.keyCode]
+    let dy = { 40: 1, 38: -1 }[evt.keyCode]
       , id = $scope.job._id
-      , idx;
+      , idx = $scope.jobs.findIndex(job => job._id === id);
     if (!dy) return;
-    for (var i=0; i<$scope.jobs.length; i++) {
-      if ($scope.jobs[i]._id === id) {
-        idx = i;
-        break;
-      }
-    }
     if (idx === -1) {
       console.log('Failed to find job.');
       return global.location = global.location;
@@ -301,5 +290,6 @@ function buildSwitcher($scope) {
     $scope.selectJob($scope.jobs[idx]._id);
     $scope.$root.$digest();
   }
+
   global.document.addEventListener('keydown', switchBuilds);
 }

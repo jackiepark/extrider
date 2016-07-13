@@ -1,13 +1,13 @@
 'use strict';
 
-var angular = require('angular');
-var interpolate = require('../utils/interpolate');
-var ManualController = require('./controllers/manual');
-var ProjectsController = require('./controllers/projects');
+import angular from 'angular';
+import interpolate from '../utils/interpolate';
+import ManualController from './controllers/manual';
+import ProjectsController from './controllers/projects';
 
-var app = angular.module('projects', ['alerts', 'moment', 'ui.bootstrap.buttons'])
+const app = angular.module('projects', ['alerts', 'moment', 'ui.bootstrap.buttons'])
   .config(['$interpolateProvider', interpolate])
   .controller('ManualController', ['$scope', '$attrs', ManualController])
   .controller('ProjectsController', ['$scope', ProjectsController]);
 
-module.exports = app; 
+export default app; 

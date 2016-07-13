@@ -1,13 +1,13 @@
 'use strict';
 
-var _ = require('lodash');
-var $ = require('jquery');
-var Sortable = require('sortablejs');
+import _ from 'lodash';
+import $ from 'jquery';
+import Sortable from 'sortablejs';
 
-module.exports= function ($parse) {
+export default function ($parse) {
   return {
     compile: function ($element, attr) {
-      var opts = {}
+      let opts = {}
         , onAdd = null
         , onRemove = null
         , groupName = attr['ngSortableGroup']
@@ -21,20 +21,20 @@ module.exports= function ($parse) {
         onAdd = attr['ngSortableAdded'];
         onRemove = attr['ngSortableRemoved'];
       }
-      var key = attr['ngSortableKey'] || '_id';
+      const key = attr['ngSortableKey'] || '_id';
       return function (scope, element) {
-        var bind = function (fnStr) {
-          var fn = $parse(fnStr)(scope);
+        const bind = function (fnStr) {
+          const fn = $parse(fnStr)(scope);
           return function (event) {
             scope.$apply(function () {
-              var data = event.type === 'update' ? model : dataSource;
-              var list = _.cloneDeep($parse(data)(scope))
+              const data = event.type === 'update' ? model : dataSource;
+              let list = _.cloneDeep($parse(data)(scope))
                 , $el = $(event.target)
                 , id = $($el).attr('ng-sortable-id')
                 , oldIndex = null
                 , newIndex = $el.index();
               if ( ! id ) throw new Error('No ng-sortable-id on element.');
-              var target = _.find(list, function (b, i) {
+              const target = _.find(list, function (b, i) {
                 oldIndex = i;
                 return b[key] === id;
               });
