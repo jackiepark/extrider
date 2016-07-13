@@ -5,6 +5,7 @@ import _ from 'lodash';
 import md5 from 'md5';
 import bootbox from 'bootbox';
 import post from '../../utils/post';
+
 const branches = global.branches || [];
 const project = global.project || {};
 const plugins = global.plugins || {};
@@ -12,6 +13,13 @@ const runners = global.runners || {};
 const userIsCreator = global.userIsCreator || false;
 const userConfigs = global.userConfigs || {};
 const statusBlocks = global.statusBlocks || {};
+
+function refreshCodeMirror({target}) {
+  const tabId = $(target).attr('href');
+  $(tabId).find('.CodeMirror').each(function(){
+    this.CodeMirror && this.CodeMirror.refresh();
+  });
+}
 
 export default function ConfigController($scope, $element, $sce) {
   // this is the parent controller.
@@ -31,10 +39,7 @@ export default function ConfigController($scope, $element, $sce) {
   $scope.page = 'config';
   $scope.finishedRepeat = function (id) {
     // When a tab is shown, reload any CodeMirror instances within
-    $('[data-toggle=tab]').on('shown', function (e) {
-      const tabId = $(e.target).attr('href');
-      $(tabId).find('[ui-codemirror]').trigger('refresh');
-    });
+    $('[data-toggle=tab]').on('shown', refreshCodeMirror);
   };
 
   $(function ConfigPageRouting() {
@@ -129,10 +134,7 @@ export default function ConfigController($scope, $element, $sce) {
   }
 
   // When a tab is shown, reload any CodeMirror instances within
-  $('[data-toggle=tab]').on('shown', function (e) {
-    const tabId = $(e.target).attr('href');
-    $(tabId).find('[ui-codemirror]').trigger('refresh');
-  });
+  $('[data-toggle=tab]').on('shown', refreshCodeMirror);
 
   $scope.switchToTab = switchToTab;
 

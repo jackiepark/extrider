@@ -1,6 +1,5 @@
 'use strict';
 import './styles/strider.less';
-import 'codemirror';
 import $ from 'jquery';
 import _ from 'lodash';
 import angular from 'angular';

@@ -1,6 +1,5 @@
 'use strict';
 
-import _ from 'lodash';
 import bootbox from 'bootbox';
 import $ from 'jquery';
 import io from 'socket.io-client';
