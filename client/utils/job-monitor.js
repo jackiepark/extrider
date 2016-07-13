@@ -1,5 +1,4 @@
-import _ from 'lodash';
-import PHASES from './phases';
+import JobStatus from './job-status';
 // The Job Monitor:
 // - update jobs based on browser events
 //
@@ -9,6 +8,7 @@ export default class JobMonitor {
     this.sock = socket;
     this.changed = changed;
     this.waiting = {};
+    this.statuses = new JobStatus();
     this.listen();
   }
 
@@ -24,57 +24,6 @@ export default class JobMonitor {
     'job.done'(job, access) {
       this.addJob(job[0], access);
       this.changed();
-    }
-  };
-
-  statuses = {
-    started(time) {
-      this.started = time;
-      this.phase = 'environment';
-      this.status = 'running';
-    },
-    errored(error) {
-      this.error = error;
-      this.status = 'errored';
-    },
-    canceled: 'errored',
-    'phase.done'(data) {
-      this.phase = PHASES.indexOf(data.phase) + 1;
-    },
-    // this is just so we'll trigger the "unknown job" lookup sooner on the dashboard
-    stdout(text) {
-    },
-    stderr(text) {
-    },
-    warning(warning) {
-      if (!this.warnings) {
-        this.warnings = [];
-      }
-      this.warnings.push(warning);
-    },
-    'plugin-data'(data) {
-      let path = data.path ? [data.plugin].concat(data.path.split('.')) : [data.plugin]
-        , last = path.pop()
-        , method = data.method || 'replace'
-        , parent;
-      parent = path.reduce(function (obj, attr) {
-        return obj[attr] || (obj[attr] = {});
-      }, this.plugin_data || (this.plugin_data = {}));
-      if (method === 'replace') {
-        parent[last] = data.data;
-      } else if (method === 'push') {
-        if (!parent[last]) {
-          parent[last] = [];
-        }
-        parent[last].push(data.data);
-      } else if (method === 'extend') {
-        if (!parent[last]) {
-          parent[last] = {};
-        }
-        _.extend(parent[last], data.data);
-      } else {
-        console.error('Invalid "plugin data" method received from plugin', data.plugin, data.method, data);
-      }
     }
   };
 

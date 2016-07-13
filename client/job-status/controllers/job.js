@@ -3,9 +3,7 @@
 import bootbox from 'bootbox';
 import $ from 'jquery';
 import io from 'socket.io-client';
-import JobDataMonitor from '../../utils/job-data-monitor';
-import PHASES from '../../utils/phases';
-import SKELS from '../../utils/skels';
+import BuildPage from '../../utils/build-page';
 import statusClasses from '../../utils/status-classes';
 
 let outputConsole;
@@ -13,75 +11,6 @@ let runtime = null;
 
 const job = global.job;
 const project = global.project;
-
-class BuildPage extends JobDataMonitor {
-  constructor(socket, project, change, scope, jobs, job) {
-    super(socket, change);
-    this.scope = scope;
-    this.project = project;
-    this.jobs = {};
-    this.jobs[job._id] = job;
-  }
-
-  emits = {
-    getUnknown: 'build:job'
-  };
-
-  job(id, access) {
-    return this.jobs[id];
-  }
-
-  addJob(job, access) {
-    if ((job.project.name || job.project) !== this.project) return;
-    this.jobs[job._id] = job;
-    const found = this.scope.jobs.findIndex(each => each === job._id);
-    if (found !== -1) {
-      this.scope.jobs.splice(found, 1);
-    }
-    if (!job.phase) job.phase = 'environment';
-    if (!job.std) {
-      job.std = {
-        out: '',
-        err: '',
-        merged: ''
-      };
-    }
-    if (!job.phases) {
-      job.phases = {};
-      PHASES.forEach(PHASE => {
-        job.phases[PHASE] = { ...SKELS.phase };
-      });
-      job.phases[job.phase].started = new Date();
-    } else {
-      if (job.phases.test.commands.length) {
-        if (job.phases.environment) {
-          job.phases.environment.collapsed = true;
-        }
-        if (job.phases.prepare) {
-          job.phases.prepare.collapsed = true;
-        }
-        if (job.phases.cleanup) {
-          job.phases.cleanup.collapsed = true;
-        }
-      }
-    }
-
-    this.scope.jobs.unshift(job);
-    this.scope.job = job;
-  }
-
-  get(id, done) {
-    if (this.jobs[id]) {
-      done(null, this.jobs[id], true);
-      return true;
-    }
-    const self = this;
-    this.sock.emit('build:job', id, function (job) {
-      self.jobs[id] = job;
-      done(null, job);
-    });
-  }
-}
 
 export default function JobController($scope, $route, $location, $filter) {
   let params = $route.current ? $route.current.params : {};
