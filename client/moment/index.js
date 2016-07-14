@@ -1,11 +1,11 @@
 'use strict';
 
-import $ from 'jquery';
-import angular from 'angular';
-import time from './directives/time';
-import toggle from './directives/toggle';
-import rawHtml from './directives/raw-html';
-import percentage from './filters/percentage';
+const $ = require('jquery');
+const angular = require('angular');
+const time = require('./directives/time');
+const toggle = require('./directives/toggle');
+const rawHtml = require('./directives/raw-html');
+const percentage = require('./filters/percentage');
 
 require('timeago');
 
@@ -20,4 +20,4 @@ const app = angular.module('moment', [])
   .directive('rawHtml', rawHtml)
   .filter('percentage', percentage);
 
-export default app;
+module.exports = app;

@@ -1,6 +1,6 @@
 'use strict';
 
-export default function ProviderController($scope) {
+function ProviderController($scope) {
   $scope.config = $scope.providerConfig();
   $scope.saving = false;
   $scope.save = function () {
@@ -10,3 +10,5 @@ export default function ProviderController($scope) {
     });
   };
 }
+
+module.exports = ProviderController;

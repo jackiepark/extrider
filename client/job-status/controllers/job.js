@@ -1,19 +1,20 @@
 'use strict';
 
-import bootbox from 'bootbox';
-import $ from 'jquery';
-import io from 'socket.io-client';
-import BuildPage from '../../utils/build-page';
-import statusClasses from '../../utils/status-classes';
-
+const _ = require('lodash');
+const bootbox = require('bootbox');
+const $ = require('jquery');
+const io = require('socket.io-client');
+const JobDataMonitor = require('../../utils/job-data-monitor');
+const PHASES = require('../../utils/phases');
+const SKELS = require('../../utils/skels');
+const statusClasses = require('../../utils/status-classes');
 let outputConsole;
 let runtime = null;
-
 const job = global.job;
-const project = global.project;
 
-export default function JobController($scope, $route, $location, $filter) {
+module.exports = function ($scope, $route, $location, $filter) {
   let params = $route.current ? $route.current.params : {};
+  const project = global.project;
   let jobid = params.id || (global.job && global.job._id);
   const socket = io.connect();
   const lastRoute = $route.current;
@@ -42,7 +43,12 @@ export default function JobController($scope, $route, $location, $filter) {
   }
 
   $scope.toggleErrorDetails = function () {
-    $scope.showErrorDetails = !$scope.showErrorDetails;
+    if ($scope.showErrorDetails) {
+      $scope.showErrorDetails = false;
+    }
+    else {
+      $scope.showErrorDetails = true;
+    }
   };
 
   $scope.clearCache = function () {
@@ -91,7 +97,12 @@ export default function JobController($scope, $route, $location, $filter) {
         if (!cached) $scope.$digest();
       });
       if (!cached) {
-        $scope.job = $scope.jobs.find(job => job._id === jobid);
+        for (let  i=0; i<$scope.jobs.length; i++) {
+          if ($scope.jobs[i]._id === jobid) {
+            $scope.job = $scope.jobs[i];
+            break;
+          }
+        }
       }
     }
   });
@@ -131,13 +142,13 @@ export default function JobController($scope, $route, $location, $filter) {
 
   $scope.$watch('job.std.merged_latest', function (value) {
     /* Tracking isn't quite working right
-     if ($scope.job.status === 'running') {
-     height = outputConsole.getBoundingClientRect().height;
-     tracking = height + outputConsole.scrollTop > outputConsole.scrollHeight - 50;
-     // console.log(tracking, height, outputConsole.scrollTop, outputConsole.scrollHeight);
-     if (!tracking) return;
-     }
-     */
+    if ($scope.job.status === 'running') {
+      height = outputConsole.getBoundingClientRect().height;
+      tracking = height + outputConsole.scrollTop > outputConsole.scrollHeight - 50;
+      // console.log(tracking, height, outputConsole.scrollTop, outputConsole.scrollHeight);
+      if (!tracking) return;
+    }
+    */
     const ansiFilter = $filter('ansi');
     $('.job-output').last().append(ansiFilter(value));
     outputConsole.scrollTop = outputConsole.scrollHeight;
@@ -170,6 +181,79 @@ export default function JobController($scope, $route, $location, $filter) {
   };
 };
 
+function BuildPage(socket, project, change, scope, jobs, job) {
+  JobDataMonitor.call(this, socket, change);
+  this.scope = scope;
+  this.project = project;
+  this.jobs = {};
+  this.jobs[job._id] = job;
+}
+
+_.extend(BuildPage.prototype, JobDataMonitor.prototype, {
+  emits: {
+    getUnknown: 'build:job'
+  },
+  job: function (id, access) {
+    return this.jobs[id];
+  },
+  addJob: function (job, access) {
+    if ((job.project.name || job.project) !== this.project) return;
+    this.jobs[job._id] = job;
+    let found = -1
+      , i;
+    for (i=0; i<this.scope.jobs.length; i++) {
+      if (this.scope.jobs[i]._id === job._id) {
+        found = i;
+        break;
+      }
+    }
+    if (found !== -1) {
+      this.scope.jobs.splice(found, 1);
+    }
+    if (!job.phase) job.phase = 'environment';
+    if (!job.std) {
+      job.std = {
+        out: '',
+        err: '',
+        merged: ''
+      };
+    }
+    if (!job.phases) {
+      job.phases = {};
+      for (i=0; i<PHASES.length; i++) {
+        job.phases[PHASES[i]] = _.cloneDeep(SKELS.phase);
+      }
+      job.phases[job.phase].started = new Date();
+    } else {
+      if (job.phases.test.commands.length) {
+        if (job.phases.environment) {
+          job.phases.environment.collapsed = true;
+        }
+        if (job.phases.prepare) {
+          job.phases.prepare.collapsed = true;
+        }
+        if (job.phases.cleanup) {
+          job.phases.cleanup.collapsed = true;
+        }
+      }
+    }
+
+    this.scope.jobs.unshift(job);
+    this.scope.job = job;
+  },
+  get: function (id, done) {
+    if (this.jobs[id]) {
+      done(null, this.jobs[id], true);
+      return true;
+    }
+    const self = this;
+    this.sock.emit('build:job', id, function (job) {
+      self.jobs[id] = job;
+      done(null, job);
+    });
+  }
+});
+
 /** manage the favicons **/
 function setFavicon(status) {
   $('link[rel*="icon"]').attr('href', '/images/icons/favicon-' + status + '.png');
@@ -177,12 +261,10 @@ function setFavicon(status) {
 
 function animateFav() {
   let alt = false;
-
   function switchit() {
     setFavicon('running' + (alt ? '-alt' : ''));
     alt = !alt;
   }
-
   return setInterval(switchit, 500);
 }
 
@@ -202,10 +284,16 @@ function updateFavicon(value) {
 
 function buildSwitcher($scope) {
   function switchBuilds(evt) {
-    let dy = { 40: 1, 38: -1 }[evt.keyCode]
+    let dy = {40: 1, 38: -1}[evt.keyCode]
       , id = $scope.job._id
-      , idx = $scope.jobs.findIndex(job => job._id === id);
+      , idx;
     if (!dy) return;
+    for (let  i=0; i<$scope.jobs.length; i++) {
+      if ($scope.jobs[i]._id === id) {
+        idx = i;
+        break;
+      }
+    }
     if (idx === -1) {
       console.log('Failed to find job.');
       return global.location = global.location;
@@ -218,6 +306,5 @@ function buildSwitcher($scope) {
     $scope.selectJob($scope.jobs[idx]._id);
     $scope.$root.$digest();
   }
-
   global.document.addEventListener('keydown', switchBuilds);
 }

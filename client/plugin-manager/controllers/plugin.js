@@ -2,7 +2,15 @@
 
 const plugins = global.plugins || {};
 
-export default function ($http, $timeout) {
+const waitForRestart = function (cb) {
+  $http.head('/').success(function () {
+    cb();
+  }).error(function () {
+    waitForRestart(cb);
+  });
+};
+
+module.exports = function ($http, $timeout) {
   this.idle = true;
   this.status = 'idle';
 
@@ -10,7 +18,7 @@ export default function ($http, $timeout) {
     this.id = id;
     this.plugin = plugins[id];
     this.plugin.controller = this;
-    for (const key in this.plugin) {
+    for (let  key in this.plugin) {
       this[key] = this.plugin[key];
     }
     this.pluginLoaded = true;
@@ -42,14 +50,6 @@ export default function ($http, $timeout) {
       this.installedVersion = 'no';
       cb();
     }.bind(this));
-  };
-
-  const waitForRestart = function (cb) {
-    $http.head('/').success(function () {
-      cb();
-    }).error(function () {
-      waitForRestart(cb);
-    });
   };
 
   this.perform = function (action, cb) {

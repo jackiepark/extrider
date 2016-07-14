@@ -1,8 +1,8 @@
 'use strict';
 
-import $ from 'jquery';
+const $ = require('jquery');
 
-export default function ($scope, $attrs) {
+module.exports = function ($scope, $attrs) {
   const provider = $attrs.id.split('-')[1];
   $scope.config = {};
   $scope.projects = global.manualProjects[provider] || [];

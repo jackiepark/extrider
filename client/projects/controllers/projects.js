@@ -1,8 +1,8 @@
 'use strict';
 
-import $ from 'jquery';
+const $ = require('jquery');
 
-export default function ($scope) {
+module.exports = function ($scope) {
   setTimeout(function () {
     if (global.location.hash === '#manual') $('a[href="#manual-setup"]').tab('show');
   }, 200);

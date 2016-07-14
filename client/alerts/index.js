@@ -1,7 +1,9 @@
 'use strict';
 
-import angular from 'angular';
-import AlertsController from './controllers/alerts';
+const angular = require('angular');
+const AlertsController = require('./controllers/alerts');
 
-export default angular.module('alerts', [])
+const app = angular.module('alerts', [])
   .controller('AlertsController', ['$scope', '$sce', AlertsController]);
+
+module.exports = app;

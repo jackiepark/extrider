@@ -1,8 +1,8 @@
 'use strict';
 
-import $ from 'jquery';
+const $ = require('jquery');
 
-export default function CollaboratorsController($scope) {
+function CollaboratorsController($scope) {
   $scope.new_email = '';
   $scope.new_access = 0;
   $scope.collaborators = global.collaborators || [];
@@ -67,3 +67,5 @@ export default function CollaboratorsController($scope) {
 function remove(ar, item) {
   ar.splice(ar.indexOf(item), 1);
 }
+
+module.exports = CollaboratorsController;

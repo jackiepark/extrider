@@ -1,6 +1,6 @@
 'use strict';
 
-export default function () {
+module.exports = function () {
   return function (input, prec) {
     if (!input && parseInt(input) !== 0) return '';
     const by = Math.pow(10, prec || 1);

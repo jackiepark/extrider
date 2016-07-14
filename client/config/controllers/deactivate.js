@@ -1,9 +1,9 @@
 'use strict';
 
-import $ from 'jquery';
-import bootbox from 'bootbox';
+const $ = require('jquery');
+const bootbox = require('bootbox');
 
-export default function DeactivateController($scope) {
+function DeactivateController($scope) {
   const message = 'This will remove all configuration and history for this project. You can always re-add it on the /projects page';
   $scope.active = $scope.panelData.deactivate;
   $scope.loading = false;
@@ -59,3 +59,5 @@ export default function DeactivateController($scope) {
     });
   };
 }
+
+module.exports = DeactivateController;

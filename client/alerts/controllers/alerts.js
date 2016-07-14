@@ -1,6 +1,6 @@
 'use strict';
 
-export default function AlertsController($scope, $sce) {
+module.exports = function ($scope, $sce) {
   $scope.message = null;
 
   $scope.error = function (text, digest) {
@@ -58,6 +58,7 @@ export default function AlertsController($scope, $sce) {
       $scope.$root.$digest();
     }
   };
+
 
   $scope.clearMessage = function () {
     if (clearTime) {

@@ -1,6 +1,6 @@
 'use strict';
 
-export default function ($interpolateProvider) {
+module.exports = function ($interpolateProvider) {
   $interpolateProvider.startSymbol('[[');
   $interpolateProvider.endSymbol(']]');
 };

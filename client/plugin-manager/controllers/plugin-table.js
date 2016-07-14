@@ -2,11 +2,11 @@
 
 const plugins = global.plugins || [];
 
-export default function ($scope) {
+module.exports = function ($scope) {
   this.busy = false;
 
   this.hasUpgrades = (function () {
-    for (const name in plugins) {
+    for (let  name in plugins) {
       const plugin = plugins[name];
       if (plugin.outdated) return true;
     }
@@ -17,7 +17,7 @@ export default function ($scope) {
     this.busy = true;
     let ticks = 0;
     const list = [];
-    for (const name in plugins) {
+    for (let  name in plugins) {
       const plugin = plugins[name];
       if (plugin.outdated) list.push(plugin);
     }

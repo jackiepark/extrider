@@ -1,10 +1,10 @@
 'use strict';
 
-import $ from 'jquery';
+const $ = require('jquery');
 const user = global.user || {};
 const providers = global.providers || {};
 
-export default function AccountController($scope, $sce) {
+function AccountController($scope, $sce) {
   $scope.user = user;
   $scope.providers = providers;
   $scope.accounts = setupAccounts($scope.user);
@@ -34,16 +34,17 @@ export default function AccountController($scope, $sce) {
   };
 
   $scope.addAccount = function (provider) {
-    let id = 0, aid;
+    let id = 0
+      , aid;
     if (!$scope.accounts[provider]) {
       $scope.accounts[provider] = [];
     }
-    $scope.accounts[provider].forEach(account => {
-      aid = parseInt(account.id, 10);
+    for (let i=0; i<$scope.accounts[provider].length; i++) {
+      aid = parseInt($scope.accounts[provider][i].id, 10);
       if (aid >= id) {
         id = aid + 1;
       }
-    });
+    }
     const acct = {
       id: id,
       provider: provider,
@@ -105,6 +106,8 @@ export default function AccountController($scope, $sce) {
   };
 }
 
+module.exports = AccountController;
+
 function setupAccounts(user) {
   const accounts = {};
 
@@ -112,12 +115,13 @@ function setupAccounts(user) {
     return accounts;
   }
 
-  user.accounts.forEach(account => {
-    if (!accounts[account.provider]) {
-      accounts[account.provider] = [];
+  for (let  i=0; i<user.accounts.length; i++) {
+    if (!accounts[user.accounts[i].provider]) {
+      accounts[user.accounts[i].provider] = [];
     }
-    accounts[account.provider].push(account);
-  });
+
+    accounts[user.accounts[i].provider].push(user.accounts[i]);
+  }
 
   return accounts;
 }

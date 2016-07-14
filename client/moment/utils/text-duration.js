@@ -1,6 +1,6 @@
 'use strict';
 
-import $ from 'jquery';
+const $ = require('jquery');
 
 const time_units = [
   {
@@ -22,19 +22,19 @@ const time_units = [
   }
 ];
 
-export default function textDuration(duration, el, whole) {
+module.exports = function textDuration(duration, el, whole) {
   if (!duration) return $(el).text('');
-  let cls = '', text = '';
-  time_units.every(unit => {
-    if (duration < unit.ms) return true;
-    cls = unit.cls;
+  let cls = '', text;
+  for (let  i=0; i<time_units.length; i++) {
+    if (duration < time_units[i].ms) continue;
+    cls = time_units[i].cls;
     text = duration + '';
-    if (unit.ms) {
-      if (whole) text = parseInt(duration / unit.ms);
-      else text = parseInt(duration / unit.ms * 10) / 10;
+    if (time_units[i].ms) {
+      if (whole) text = parseInt(duration / time_units[i].ms);
+      else text = parseInt(duration / time_units[i].ms * 10) / 10;
     }
-    text += unit.suffix;
-    return false;
-  });
+    text += time_units[i].suffix;
+    break;
+  }
   $(el).addClass(cls).text(text);
 };

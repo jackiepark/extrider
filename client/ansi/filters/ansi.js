@@ -1,11 +1,10 @@
 'use strict';
 
-import ansi_up from 'ansi_up';
+const ansi_up = require('ansi_up');
 
-export default function ansi() {
+module.exports = function () {
   return function (input, plaintext) {
     if (!input) return '';
-    if (input.length > 100000) return input;
     // handle the characters for "delete line" and "move to start of line"
     const startswithcr = /^[^\n]*\r[^\n]/.test(input);
     input = input.replace(/^[^\n\r]*\u001b\[2K/gm, '')
@@ -17,5 +16,3 @@ export default function ansi() {
     return ansi_up.ansi_to_html(ansi_up.escape_for_html(input));
   };
 };
-
-module.exports = ansi;

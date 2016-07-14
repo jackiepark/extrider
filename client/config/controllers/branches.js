@@ -1,10 +1,10 @@
 'use strict';
 
-import $ from 'jquery';
+const $ = require('jquery');
 const branches = global.branches || [];
 const allBranches = global.allBranches || [];
 
-export default function BranchesController($scope) {
+function BranchesController($scope) {
   $scope.branchName = '';
   $scope.branches = branches;
   $scope.allBranches = allBranches;
@@ -119,3 +119,5 @@ export default function BranchesController($scope) {
 function remove(ar, item) {
   ar.splice(ar.indexOf(item), 1);
 }
+
+module.exports = BranchesController;

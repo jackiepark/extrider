@@ -1,6 +1,6 @@
 'use strict';
 
-export default function RunnerController($scope, $element) {
+function RunnerController($scope, $element) {
   const name = $element.attr('id').split('-').slice(1).join('-');
   $scope.saving = false;
   $scope.$watch('runnerConfigs[branch.name]["' + name + '"]', function (value) {
@@ -14,3 +14,5 @@ export default function RunnerController($scope, $element) {
     });
   };
 }
+
+module.exports = RunnerController;

@@ -1,11 +1,10 @@
 'use strict';
 
-import $ from 'jquery';
-import _ from 'lodash';
-import md5 from 'md5';
-import bootbox from 'bootbox';
-import post from '../../utils/post';
-
+const $ = require('jquery');
+const _ = require('lodash');
+const md5 = require('md5');
+const bootbox = require('bootbox');
+const post = require('../../utils/post');
 const branches = global.branches || [];
 const project = global.project || {};
 const plugins = global.plugins || {};
@@ -14,14 +13,7 @@ const userIsCreator = global.userIsCreator || false;
 const userConfigs = global.userConfigs || {};
 const statusBlocks = global.statusBlocks || {};
 
-function refreshCodeMirror({target}) {
-  const tabId = $(target).attr('href');
-  $(tabId).find('.CodeMirror').each(function(){
-    this.CodeMirror && this.CodeMirror.refresh();
-  });
-}
-
-export default function ConfigController($scope, $element, $sce) {
+function ConfigController($scope, $element, $sce) {
   // this is the parent controller.
   $scope.project = project;
   $scope.plugins = plugins;
@@ -39,7 +31,10 @@ export default function ConfigController($scope, $element, $sce) {
   $scope.page = 'config';
   $scope.finishedRepeat = function (id) {
     // When a tab is shown, reload any CodeMirror instances within
-    $('[data-toggle=tab]').on('shown', refreshCodeMirror);
+    $('[data-toggle=tab]').on('shown', function (e) {
+      const tabId = $(e.target).attr('href');
+      $(tabId).find('[ui-codemirror]').trigger('refresh');
+    });
   };
 
   $(function ConfigPageRouting() {
@@ -134,7 +129,10 @@ export default function ConfigController($scope, $element, $sce) {
   }
 
   // When a tab is shown, reload any CodeMirror instances within
-  $('[data-toggle=tab]').on('shown', refreshCodeMirror);
+  $('[data-toggle=tab]').on('shown', function (e) {
+    const tabId = $(e.target).attr('href');
+    $(tabId).find('[ui-codemirror]').trigger('refresh');
+  });
 
   $scope.switchToTab = switchToTab;
 
@@ -153,7 +151,12 @@ export default function ConfigController($scope, $element, $sce) {
   $scope.savePluginOrder = savePluginOrder;
 
   $scope.switchToMaster = function () {
-    $scope.branch = $scope.project.branches.find(branch => branch.name === 'master');
+    for (let i = 0; i < $scope.project.branches.length; i++) {
+      if ($scope.project.branches[i].name === 'master') {
+        $scope.branch = $scope.project.branches[i];
+        return;
+      }
+    }
   };
 
   $scope.clearCache = function () {
@@ -181,7 +184,15 @@ export default function ConfigController($scope, $element, $sce) {
       $scope.branch.isCustomizable = true;
 
       const name = $scope.branch.name;
-      const master = $scope.project.branches.find(branch => branch.name === 'master');
+      let master;
+
+      for (let i = 0; i < $scope.project.branches.length; i++) {
+        if ($scope.project.branches[i].name === 'master') {
+          master = $scope.project.branches[i];
+          break;
+        }
+      }
+
       $scope.branch = $.extend(true, $scope.branch, master);
       $scope.branch.name = name;
       initBranch($scope.branch);
@@ -209,9 +220,11 @@ export default function ConfigController($scope, $element, $sce) {
     const plugins = $scope.branch.plugins;
 
     $scope.configured[$scope.branch.name] = {};
-    plugins.forEach(plugin => {
-      $scope.configured[$scope.branch.name][plugin.id] = true;
-    });
+
+    for (let i = 0; i < plugins.length; i++) {
+      $scope.configured[$scope.branch.name][plugins[i].id] = true;
+    }
+
     savePluginOrder();
   }
 
@@ -219,11 +232,15 @@ export default function ConfigController($scope, $element, $sce) {
     const plugins = $scope.branch.plugins;
     const branch = $scope.branch;
     const project = $scope.project;
-    const data = plugins.map(plugin => ({
-      id: plugin.id,
-      enabled: plugin.enabled,
-      showStatus: plugin.showStatus
-    }));
+    const data = [];
+
+    for (let i = 0; i < plugins.length; i++) {
+      data.push({
+        id: plugins[i].id,
+        enabled: plugins[i].enabled,
+        showStatus: plugins[i].showStatus
+      });
+    }
 
     saveProjectConfig({ plugin_order: data }, branch, project, function (err, result) {
       if (err) {
@@ -281,21 +298,25 @@ export default function ConfigController($scope, $element, $sce) {
   };
 
   function initBranch(branch) {
+    let plugins;
+
     $scope.configured[branch.name] = {};
     $scope.configs[branch.name] = {};
     $scope.runnerConfigs[branch.name] = {};
     $scope.disabled_plugins[branch.name] = [];
 
     if (!branch.mirror_master) {
-      branch.plugins.forEach(plugin => {
-        $scope.configured[branch.name][plugin.id] = true;
-        $scope.configs[branch.name][plugin.id] = plugin;
-      });
+      plugins = branch.plugins;
+
+      for (let  i = 0; i < plugins.length; i++) {
+        $scope.configured[branch.name][plugins[i].id] = true;
+        $scope.configs[branch.name][plugins[i].id] = plugins[i];
+      }
     }
 
-    Object.keys($scope.plugins).forEach(plugin => {
+    for (let  plugin in $scope.plugins) {
       if ($scope.configured[branch.name][plugin]) {
-        return;
+        continue;
       }
 
       $scope.configs[branch.name][plugin] = {
@@ -305,18 +326,19 @@ export default function ConfigController($scope, $element, $sce) {
       };
 
       $scope.disabled_plugins[branch.name].push($scope.configs[branch.name][plugin]);
-    });
+    }
 
     if (!branch.mirror_master) {
       $scope.runnerConfigs[branch.name][branch.runner.id] = branch.runner.config;
     }
 
-    Object.keys($scope.runners).forEach(runner => {
+    for (let  runner in $scope.runners) {
       if (!branch.mirror_master && runner === branch.runner.id) {
-        return;
+        continue;
       }
+
       $scope.runnerConfigs[branch.name][runner] = {};
-    });
+    }
   }
 
   function initPlugins() {
@@ -613,3 +635,5 @@ function saveProjectConfig(data, branch, project, cb) {
     }
   });
 }
+
+module.exports = ConfigController;

@@ -1,6 +1,6 @@
 'use strict';
 
-export default function ProviderController($scope, $element, $attrs) {
+function ProviderController($scope, $element, $attrs) {
   const name = $attrs.id.split('-')[2];
   $scope.$watch('account.config', function (value) {
     $scope.config = value;
@@ -13,3 +13,5 @@ export default function ProviderController($scope, $element, $attrs) {
     });
   };
 }
+
+module.exports = ProviderController;

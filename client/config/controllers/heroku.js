@@ -1,8 +1,8 @@
 'use strict';
 
-import $ from 'jquery';
+const $ = require('jquery');
 
-export default function HerokuController($scope) {
+function HerokuController($scope) {
   $scope.heroku = $scope.panelData.heroku;
   $scope.deploy_on_green = ($scope.repo.prod_deploy_target ?
                             $scope.repo.prod_deploy_target.deploy_on_green : true);
@@ -113,3 +113,5 @@ export default function HerokuController($scope) {
     });
   };
 }
+
+module.exports = HerokuController;

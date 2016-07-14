@@ -1,6 +1,6 @@
 'use strict';
 
-import $ from 'jquery';
+const $ = require('jquery');
 
 function post(url, data, done) {
   $.ajax({
@@ -21,4 +21,4 @@ function post(url, data, done) {
   });
 }
 
-export default post;
+module.exports = post;

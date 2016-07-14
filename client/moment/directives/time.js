@@ -1,9 +1,9 @@
 'use strict';
 
-import $ from 'jquery';
-import textDuration from '../utils/text-duration';
+const $ = require('jquery');
+const textDuration = require('../utils/text-duration');
 
-export default function () {
+module.exports = function () {
   return {
     restrict: 'E',
     link: function (scope, element, attrs) {

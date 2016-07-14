@@ -1,6 +1,6 @@
 'use strict';
 
-export default function () {
+module.exports = function () {
   return {
     restrict: 'A',
     scope: {},

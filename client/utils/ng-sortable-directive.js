@@ -1,10 +1,10 @@
 'use strict';
 
-import _ from 'lodash';
-import $ from 'jquery';
-import Sortable from 'sortablejs';
+const _ = require('lodash');
+const $ = require('jquery');
+const Sortable = require('sortablejs');
 
-export default function ($parse) {
+module.exports= function ($parse) {
   return {
     compile: function ($element, attr) {
       let opts = {}

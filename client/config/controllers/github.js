@@ -1,9 +1,9 @@
 'use strict';
 
-import $ from 'jquery';
-import bootbox from 'bootbox';
+const $ = require('jquery');
+const bootbox = require('bootbox');
 
-export default function GithubController($scope) {
+function GithubController($scope) {
   $scope.removeWebhooks = function () {
     bootbox.confirm('<h2>Really remove the github webhooks?</h2> <p>If you only want to temporarily disable build on commit, go to the "Deactivate" tab', 'Just kidding', 'Yes, really', function (result) {
       if (!result) return;
@@ -25,3 +25,5 @@ export default function GithubController($scope) {
     });
   };
 }
+
+module.exports = GithubController;
