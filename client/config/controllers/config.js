@@ -1,10 +1,10 @@
 'use strict';
 
-const $ = require('jquery');
-const _ = require('lodash');
-const md5 = require('md5');
-const bootbox = require('bootbox');
-const post = require('../../utils/post');
+import $ from 'jquery' ;
+import _ from 'lodash' ;
+import md5 from 'md5' ;
+import bootbox from 'bootbox' ;
+import post from '../../utils/post' ;
 const branches = global.branches || [];
 const project = global.project || {};
 const plugins = global.plugins || {};
@@ -12,6 +12,13 @@ const runners = global.runners || {};
 const userIsCreator = global.userIsCreator || false;
 const userConfigs = global.userConfigs || {};
 const statusBlocks = global.statusBlocks || {};
+
+function refreshCodeMirror({ target }) {
+  const tabId = $(target).attr('href');
+  $(tabId).find('.CodeMirror').each(function () {
+    this.CodeMirror && this.CodeMirror.refresh();
+  });
+}
 
 function ConfigController($scope, $element, $sce) {
   // this is the parent controller.
@@ -31,10 +38,7 @@ function ConfigController($scope, $element, $sce) {
   $scope.page = 'config';
   $scope.finishedRepeat = function (id) {
     // When a tab is shown, reload any CodeMirror instances within
-    $('[data-toggle=tab]').on('shown', function (e) {
-      const tabId = $(e.target).attr('href');
-      $(tabId).find('[ui-codemirror]').trigger('refresh');
-    });
+    $('[data-toggle=tab]').on('shown', refreshCodeMirror);
   };
 
   $(function ConfigPageRouting() {
@@ -85,7 +89,7 @@ function ConfigController($scope, $element, $sce) {
         }
 
         // Check the URL to see if we should go straight to a tab
-        const lastPart = pathParts[pathParts.length-1];
+        const lastPart = pathParts[pathParts.length - 1];
         let tabName;
 
         if (pathParts.length === 5 && lastPart.length) {
@@ -129,10 +133,7 @@ function ConfigController($scope, $element, $sce) {
   }
 
   // When a tab is shown, reload any CodeMirror instances within
-  $('[data-toggle=tab]').on('shown', function (e) {
-    const tabId = $(e.target).attr('href');
-    $(tabId).find('[ui-codemirror]').trigger('refresh');
-  });
+  $('[data-toggle=tab]').on('shown', refreshCodeMirror);
 
   $scope.switchToTab = switchToTab;
 
@@ -308,13 +309,13 @@ function ConfigController($scope, $element, $sce) {
     if (!branch.mirror_master) {
       plugins = branch.plugins;
 
-      for (let  i = 0; i < plugins.length; i++) {
+      for (let i = 0; i < plugins.length; i++) {
         $scope.configured[branch.name][plugins[i].id] = true;
         $scope.configs[branch.name][plugins[i].id] = plugins[i];
       }
     }
 
-    for (let  plugin in $scope.plugins) {
+    for (let plugin in $scope.plugins) {
       if ($scope.configured[branch.name][plugin]) {
         continue;
       }
@@ -332,7 +333,7 @@ function ConfigController($scope, $element, $sce) {
       $scope.runnerConfigs[branch.name][branch.runner.id] = branch.runner.config;
     }
 
-    for (let  runner in $scope.runners) {
+    for (let runner in $scope.runners) {
       if (!branch.mirror_master && runner === branch.runner.id) {
         continue;
       }
@@ -407,7 +408,7 @@ function ConfigController($scope, $element, $sce) {
   $scope.saveRunner = function (id, config) {
     $.ajax({
       url: '/' + $scope.project.name + '/config/branch/runner/id/?branch=' + encodeURIComponent($scope.branch.name),
-      data: JSON.stringify({id: id, config: config}),
+      data: JSON.stringify({ id: id, config: config }),
       contentType: 'application/json',
       type: 'PUT',
       success: function () {
@@ -559,7 +560,7 @@ function ConfigController($scope, $element, $sce) {
   $scope.startTest = function (name) {
     $.ajax({
       url: '/' + $scope.project.name + '/start',
-      data:{ branch: $scope.branch.name, type: 'TEST_ONLY', page: 'config' },
+      data: { branch: $scope.branch.name, type: 'TEST_ONLY', page: 'config' },
       type: 'POST',
       success: function () {
         global.location = '/' + $scope.project.name + '/';
@@ -577,7 +578,7 @@ function ConfigController($scope, $element, $sce) {
   $scope.startDeploy = function (name) {
     $.ajax({
       url: '/' + $scope.project.name + '/start',
-      data:{ branch: $scope.branch.name, type: 'TEST_AND_DEPLOY', page: 'config' },
+      data: { branch: $scope.branch.name, type: 'TEST_AND_DEPLOY', page: 'config' },
       type: 'POST',
       success: function () {
         global.location = '/' + $scope.project.name + '/';
@@ -636,4 +637,4 @@ function saveProjectConfig(data, branch, project, cb) {
   });
 }
 
-module.exports = ConfigController;
+export default ConfigController;

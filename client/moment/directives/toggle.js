@@ -1,8 +1,8 @@
 'use strict';
 
-const $ = require('jquery');
+import $ from 'jquery' ;
 
-module.exports = function () {
+export default function () {
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {

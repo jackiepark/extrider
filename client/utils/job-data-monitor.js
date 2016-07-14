@@ -1,8 +1,8 @@
 'use strict';
 
-const _ = require('lodash');
-const JobMonitor = require('./job-monitor');
-const SKELS = require('./skels');
+import _ from 'lodash' ;
+import JobMonitor from './job-monitor' ;
+import SKELS from './skels' ;
 
 function JobDataMonitor() {
   JobMonitor.apply(this, arguments);
@@ -76,4 +76,4 @@ function ensureCommand(phase) {
   return command;
 }
 
-module.exports = JobDataMonitor;
+export default JobDataMonitor;

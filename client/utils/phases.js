@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = ['environment', 'prepare', 'test', 'deploy', 'cleanup'];
+export default ['environment', 'prepare', 'test', 'deploy', 'cleanup'];

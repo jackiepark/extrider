@@ -21,4 +21,4 @@ function JobController($scope, $element) {
   };
 }
 
-module.exports = JobController;
+export default JobController;

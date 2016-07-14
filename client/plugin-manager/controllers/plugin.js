@@ -10,7 +10,7 @@ const waitForRestart = function (cb) {
   });
 };
 
-module.exports = function ($http, $timeout) {
+export default function ($http, $timeout) {
   this.idle = true;
   this.status = 'idle';
 

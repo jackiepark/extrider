@@ -1,6 +1,6 @@
-const _ = require('lodash');
-const PHASES = require('./phases');
-const SKELS = require('./skels');
+import _ from 'lodash' ;
+import PHASES from './phases' ;
+import SKELS from './skels' ;
 
 // The Job Monitor:
 // - update jobs based on browser events
@@ -133,4 +133,4 @@ JobMonitor.prototype = {
 };
 
 
-module.exports = JobMonitor;
+export default JobMonitor;

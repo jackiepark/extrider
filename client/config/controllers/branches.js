@@ -1,6 +1,6 @@
 'use strict';
 
-const $ = require('jquery');
+import $ from 'jquery' ;
 const branches = global.branches || [];
 const allBranches = global.allBranches || [];
 
@@ -120,4 +120,4 @@ function remove(ar, item) {
   ar.splice(ar.indexOf(item), 1);
 }
 
-module.exports = BranchesController;
+export default BranchesController;

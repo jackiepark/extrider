@@ -2,13 +2,13 @@
 /* global JobMonitor: true, io: true */
 'use strict';
 
-const $ = require('jquery');
-const _ = require('lodash');
-const io = require('socket.io-client');
-const JobMonitor = require('../../utils/job-monitor');
-const statusClasses = require('../../utils/status-classes');
+import $ from 'jquery' ;
+import _ from 'lodash' ;
+import io from 'socket.io-client' ;
+import JobMonitor from '../../utils/job-monitor' ;
+import statusClasses from '../../utils/status-classes' ;
 
-module.exports = function ($scope, $element) {
+export default function ($scope, $element) {
   const socket = io.connect();
   const dash = new Dashboard(socket, $scope);
 

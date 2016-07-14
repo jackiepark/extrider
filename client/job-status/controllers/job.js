@@ -1,18 +1,18 @@
 'use strict';
 
-const _ = require('lodash');
-const bootbox = require('bootbox');
-const $ = require('jquery');
-const io = require('socket.io-client');
-const JobDataMonitor = require('../../utils/job-data-monitor');
-const PHASES = require('../../utils/phases');
-const SKELS = require('../../utils/skels');
-const statusClasses = require('../../utils/status-classes');
+import _ from 'lodash' ;
+import bootbox from 'bootbox' ;
+import $ from 'jquery' ;
+import io from 'socket.io-client' ;
+import JobDataMonitor from '../../utils/job-data-monitor' ;
+import PHASES from '../../utils/phases' ;
+import SKELS from '../../utils/skels' ;
+import statusClasses from '../../utils/status-classes' ;
 let outputConsole;
 let runtime = null;
 const job = global.job;
 
-module.exports = function ($scope, $route, $location, $filter) {
+export default function ($scope, $route, $location, $filter) {
   let params = $route.current ? $route.current.params : {};
   const project = global.project;
   let jobid = params.id || (global.job && global.job._id);

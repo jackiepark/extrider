@@ -2,7 +2,7 @@
 
 const plugins = global.plugins || [];
 
-module.exports = function ($scope) {
+export default function ($scope) {
   this.busy = false;
 
   this.hasUpgrades = (function () {

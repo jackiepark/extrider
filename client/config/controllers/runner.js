@@ -15,4 +15,4 @@ function RunnerController($scope, $element) {
   };
 }
 
-module.exports = RunnerController;
+export default RunnerController;

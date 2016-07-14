@@ -1,7 +1,7 @@
 'use strict';
 
-const $ = require('jquery');
-const bootbox = require('bootbox');
+import $ from 'jquery' ;
+import bootbox from 'bootbox' ;
 
 function GithubController($scope) {
   $scope.removeWebhooks = function () {
@@ -26,4 +26,4 @@ function GithubController($scope) {
   };
 }
 
-module.exports = GithubController;
+export default GithubController;

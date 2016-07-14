@@ -1,6 +1,6 @@
 'use strict';
 
-const $ = require('jquery');
+import $ from 'jquery' ;
 
 function HerokuController($scope) {
   $scope.heroku = $scope.panelData.heroku;
@@ -114,4 +114,4 @@ function HerokuController($scope) {
   };
 }
 
-module.exports = HerokuController;
+export default HerokuController;

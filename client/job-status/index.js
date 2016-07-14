@@ -2,11 +2,11 @@
 /* globals bootbox: true, io: true, SKELS: true, job: true */
 'use strict';
 
-const angular = require('angular');
-const routes = require('./configs/routes.js');
-const pluginStatus = require('./directives/plugin-status');
-const JobController = require('./controllers/job');
-const interpolate = require('../utils/interpolate');
+import angular from 'angular' ;
+import routes from './configs/routes.js' ;
+import pluginStatus from './directives/plugin-status' ;
+import JobController from './controllers/job' ;
+import interpolate from '../utils/interpolate' ;
 
 const app = angular.module('job-status', ['moment', 'ansi', 'ngRoute'])
   .config(['$interpolateProvider', interpolate])
@@ -14,4 +14,4 @@ const app = angular.module('job-status', ['moment', 'ansi', 'ngRoute'])
   .controller('JobCtrl', ['$scope', '$route', '$location', '$filter', JobController])
   .directive('pluginStatus', pluginStatus);
 
-module.exports = app;
+export default app;

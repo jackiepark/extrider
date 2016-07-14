@@ -1,6 +1,6 @@
 'use strict';
 
-const $ = require('jquery');
+import $ from 'jquery' ;
 
 const time_units = [
   {
@@ -22,7 +22,7 @@ const time_units = [
   }
 ];
 
-module.exports = function textDuration(duration, el, whole) {
+export default function textDuration(duration, el, whole) {
   if (!duration) return $(el).text('');
   let cls = '', text;
   for (let  i=0; i<time_units.length; i++) {

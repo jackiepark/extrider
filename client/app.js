@@ -1,9 +1,9 @@
 'use strict';
 require('./styles/strider.less');
-const $ = require('jquery');
-const _ = require('lodash');
-const angular = require('angular');
-const ngRoute = require('angular-route');
+import $ from 'jquery' ;
+import _ from 'lodash' ;
+import angular from 'angular' ;
+import ngRoute from 'angular-route' ;
 const $navbar = $('.navbar');
 
 $navbar.find('li').removeClass('active');

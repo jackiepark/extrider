@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function (location, route) {
+export default function (location, route) {
   const one = {
     controller: 'JobCtrl',
     templateUrl: 'build-tpl.html'

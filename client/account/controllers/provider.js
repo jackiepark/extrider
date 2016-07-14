@@ -14,4 +14,4 @@ function ProviderController($scope, $element, $attrs) {
   };
 }
 
-module.exports = ProviderController;
+export default ProviderController;

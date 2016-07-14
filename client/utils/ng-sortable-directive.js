@@ -1,8 +1,8 @@
 'use strict';
 
-const _ = require('lodash');
-const $ = require('jquery');
-const Sortable = require('sortablejs');
+import _ from 'lodash' ;
+import $ from 'jquery' ;
+import Sortable from 'sortablejs' ;
 
 module.exports= function ($parse) {
   return {

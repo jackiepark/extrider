@@ -1,6 +1,6 @@
 'use strict';
 
-const $ = require('jquery');
+import $ from 'jquery' ;
 const user = global.user || {};
 const providers = global.providers || {};
 
@@ -106,7 +106,7 @@ function AccountController($scope, $sce) {
   };
 }
 
-module.exports = AccountController;
+export default AccountController;
 
 function setupAccounts(user) {
   const accounts = {};

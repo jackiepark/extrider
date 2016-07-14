@@ -1,17 +1,17 @@
 'use strict';
 
-const angular = require('angular');
-const RunnerController = require('./controllers/runner');
-const ProviderController = require('./controllers/provider');
-const JobController = require('./controllers/job');
-const ConfigController = require('./controllers/config');
-const BranchesController = require('./controllers/branches');
-const CollaboratorsController = require('./controllers/collaborators');
-const DeactivateController = require('./controllers/deactivate');
-const HerokuController = require('./controllers/heroku');
-const GithubController = require('./controllers/github');
-const interpolate = require('../utils/interpolate');
-const ngSortableDirective = require('../utils/ng-sortable-directive');
+import angular from 'angular' ;
+import RunnerController from './controllers/runner' ;
+import ProviderController from './controllers/provider' ;
+import JobController from './controllers/job' ;
+import ConfigController from './controllers/config' ;
+import BranchesController from './controllers/branches' ;
+import CollaboratorsController from './controllers/collaborators' ;
+import DeactivateController from './controllers/deactivate' ;
+import HerokuController from './controllers/heroku' ;
+import GithubController from './controllers/github' ;
+import interpolate from '../utils/interpolate' ;
+import ngSortableDirective from '../utils/ng-sortable-directive' ;
 
 const app = angular.module('config', ['ui.bootstrap', 'ui.codemirror', 'alerts', 'moment'])
   .config(['$interpolateProvider', interpolate])
@@ -33,4 +33,4 @@ const app = angular.module('config', ['ui.bootstrap', 'ui.codemirror', 'alerts',
     };
   });
 
-module.exports = app;
+export default app;

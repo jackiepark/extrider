@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function ($scope, $sce) {
+export default function ($scope, $sce) {
   $scope.message = null;
 
   $scope.error = function (text, digest) {
