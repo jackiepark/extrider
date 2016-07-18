@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-require('babel-register');
-require('babel-polyfill');
 var cli = require('strider-cli')({
   version: require('../package.json').version,
   /*

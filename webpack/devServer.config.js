@@ -5,10 +5,7 @@ module.exports = {
   devtool: 'inline-source-map',
   context: path.resolve(__dirname, '..'),
   entry: {
-    app: [
-      'webpack-hot-middleware/client',
-      './client/app.js'
-    ]
+    app: './client/app.js'
   },
   output: {
     path: path.join(__dirname, '..', 'dist'),
@@ -33,7 +30,6 @@ module.exports = {
   },
   plugins: [
     new webpack.optimize.OccurenceOrderPlugin(),
-    new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin()
   ]
 };

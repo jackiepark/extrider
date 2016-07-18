@@ -1,8 +1,8 @@
 'use strict';
 
-import ansi_up from 'ansi_up' ;
+const ansi_up = require('ansi_up');
 
-export default function () {
+module.exports = function ansi() {
   return function (input, plaintext) {
     if (!input) return '';
     // handle the characters for "delete line" and "move to start of line"

@@ -71,16 +71,25 @@ export default class BuildPage extends JobMonitor {
       return true;
     }
     const self = this;
-    this.sock.emit('build:job', id, function (job) {
+    this.socket.emit('build:job', id, function (job) {
       self.jobs[id] = job;
       done(null, job);
     });
   }
 }
 
+function ensureCommand(phase) {
+  let command = phase.commands[phase.commands.length - 1];
+  if (!command || typeof(command.finished) !== 'undefined') {
+    command = { ...SKELS.command };
+    phase.commands.push(command);
+  }
+  return command;
+}
+
 BuildPage.prototype.statuses = {
   ...JobMonitor.prototype.statuses,
-  'phase.done': function (data) {
+  'phase.done'(data) {
     this.phases[data.phase].finished = data.time;
     this.phases[data.phase].duration = data.elapsed;
     this.phases[data.phase].exitCode = data.code;
@@ -93,7 +102,7 @@ BuildPage.prototype.statuses = {
     this.phase = data.next;
     this.phases[data.next].started = data.time;
   },
-  'command.comment': function (data) {
+  'command.comment'(data) {
     const phase = this.phases[this.phase]
       , command = { ...SKELS.command };
     command.command = data.comment;
@@ -102,13 +111,13 @@ BuildPage.prototype.statuses = {
     command.finished = data.time;
     phase.commands.push(command);
   },
-  'command.start': function (data) {
+  'command.start'(data) {
     const phase = this.phases[this.phase]
       , command = { ...SKELS.command, ...data };
     command.started = data.time;
     phase.commands.push(command);
   },
-  'command.done': function (data) {
+  'command.done'(data) {
     const phase = this.phases[this.phase]
       , command = phase.commands[phase.commands.length - 1];
     command.finished = data.time;
@@ -116,8 +125,7 @@ BuildPage.prototype.statuses = {
     command.exitCode = data.exitCode;
     command.merged = command._merged;
   },
-  'stdout': function (text) {
-    console.log(new Error().stack);
+  'stdout'(text) {
     const command = ensureCommand(this.phases[this.phase]);
     command.out += text;
     command._merged += text;
@@ -125,8 +133,7 @@ BuildPage.prototype.statuses = {
     this.std.merged += text;
     this.std.merged_latest = text;
   },
-  'stderr': function (text) {
-    console.log(text);
+  'stderr'(text) {
     const command = ensureCommand(this.phases[this.phase]);
     command.err += text;
     command._merged += text;
@@ -135,12 +142,3 @@ BuildPage.prototype.statuses = {
     this.std.merged_latest = text;
   }
 };
-
-function ensureCommand(phase) {
-  let command = phase.commands[phase.commands.length - 1];
-  if (!command || typeof(command.finished) !== 'undefined') {
-    command = { ...SKELS.command };
-    phase.commands.push(command);
-  }
-  return command;
-}

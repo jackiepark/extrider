@@ -3,6 +3,7 @@
 import bootbox from 'bootbox' ;
 import $ from 'jquery' ;
 import io from 'socket.io-client' ;
+import ioWildCard from 'socketio-wildcard';
 import statusClasses from '../../utils/status-classes' ;
 import BuildPage from '../../utils/BuildPage';
 
@@ -15,6 +16,7 @@ export default function ($scope, $route, $location, $filter) {
   const project = global.project;
   let jobid = params.id || (global.job && global.job._id);
   const socket = io.connect();
+  ioWildCard(io.Manager)(socket);
   const lastRoute = $route.current;
   const jobman = new BuildPage(socket, project.name, $scope.$digest.bind($scope), $scope, global.jobs, global.job);
 
@@ -164,6 +166,7 @@ export default function ($scope, $route, $location, $filter) {
     };
   };
   $scope.startTest = function (job) {
+    console.log(job);
     $('.tooltip').hide();
     socket.emit('test', project.name, job && job.ref.branch);
     $scope.job = {

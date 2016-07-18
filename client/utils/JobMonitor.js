@@ -5,7 +5,7 @@ import PHASES from './phases' ;
 //
 export default class JobMonitor {
   constructor(socket, changed) {
-    this.sock = socket;
+    this.socket = socket;
     this.changed = changed;
     this.waiting = {};
     this.listen();
@@ -35,18 +35,17 @@ export default class JobMonitor {
   }
 
   listen() {
-    let handler;
-    for (let event in this.events) {
-      handler = this.events[event];
-      if ('string' === typeof handler) handler = this[handler];
-      this.sock.on(event, handler.bind(this));
-    }
-    for (let status in this.statuses) {
-      this.sock.on('job.status.' + status, this.update.bind(this, status));
-    }
+    Object.keys(this.events).forEach(event => {
+      let handler = this.events[event];
+      if (typeof handler === 'string') handler = this[handler];
+      this.socket.on(event, handler.bind(this));
+    });
+    Object.keys(this.statuses).forEach(status => {
+      this.socket.on(`job.status.${status}`, this.update.bind(this, status));
+    });
   }
 
-// access: 'yours', 'public', 'admin'
+  // access: 'yours', 'public', 'admin'
   update(event, args, access, dontchange) {
     const id = args.shift()
       , job = this.job(id, access)
@@ -67,7 +66,7 @@ export default class JobMonitor {
       return this.waiting[id].push([event, args, access]);
     }
     this.waiting[id] = [[event, args, access]];
-    this.sock.emit(this.emits.getUnknown, id, this.gotUnknown.bind(this));
+    this.socket.emit(this.emits.getUnknown, id, this.gotUnknown.bind(this));
   }
 
   gotUnknown(job) {
